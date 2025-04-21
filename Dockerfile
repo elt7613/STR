@@ -1,18 +1,20 @@
-FROM php:8.1-apache
+FROM php:8.1-fpm
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    git \
-    curl
+    curl \
+    nginx
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql mysqli zip
+RUN docker-php-ext-install pdo_mysql mysqli zip
 
-# Enable Apache modules
-RUN a2enmod rewrite headers
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+RUN rm -f /etc/nginx/sites-enabled/default.conf
 
 # Set working directory
 WORKDIR /var/www/html
@@ -20,14 +22,19 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . /var/www/html/
 
+# Create PHP info file to test PHP processing
+RUN echo "<?php phpinfo(); ?>" > /var/www/html/public/info.php
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html/public
 
-# Configure Apache
-RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+# Create startup script to run both nginx and php-fpm
+RUN echo '#!/bin/bash\nservice nginx start\nphp-fpm -F' > /start.sh
+RUN chmod +x /start.sh
 
 # Expose port 80
 EXPOSE 80
 
-# Start Apache
-CMD ["apache2-foreground"] 
+# Start services
+CMD ["/start.sh"] 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coolify - Static Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Coolify Static File Test</h1>
+        <p>If you can see this page, nginx is correctly serving static HTML files.</p>
+        <p class="success">✓ Static file serving is working!</p>
+        <p>Now try accessing these files to test PHP processing:</p>
+        <ul>
+            <li><a href="info.php">info.php</a> - Shows PHP configuration</li>
+            <li><a href="index.php">index.php</a> - Main application entry point</li>
+        </ul>
+    </div>
+</body>
+</html> 
