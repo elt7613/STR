@@ -2,6 +2,11 @@
 // Include database connection
 require_once __DIR__ . '/database.php';
 
+// Check if $pdo is defined
+if (!isset($pdo)) {
+    die("Database connection error: PDO variable is not defined in database.php");
+}
+
 // Function to check if users table exists, if not create it
 function ensureUsersTableExists($pdo) {
     $sql = "CREATE TABLE IF NOT EXISTS users (
