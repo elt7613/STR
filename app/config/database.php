@@ -1,28 +1,17 @@
 <?php
 // Database connection configuration
 
-// URL-based database connection (getting parameters from URL)
-$databaseUrl = 'mysql://mysql:vjKSSrMJRPWdMmsb3Kr3bgRrknx6mFOb4qtIaXAMO1ncQ4AVAjlvrKbQW60kX2Zf@106.51.142.222:7845/default';
-
 // Initialize $pdo and $conn as null
 $pdo = null;
 $conn = null;
 
 try {
-    // Parse database URL components
-    $dbComponents = parse_url($databaseUrl);
-    
-    // Extract database connection details from URL
-    $servername = $dbComponents['host'] ?? '';
-    $port = $dbComponents['port'] ?? '';
-    $username = $dbComponents['user'] ?? '';
-    $password = $dbComponents['pass'] ?? '';
-    $dbname = ltrim($dbComponents['path'] ?? '', '/');
-
-    // $servername = "localhost";
-    // $username = "u599418396_str_database";
-    // $password = "STR_database@123#";
-    // $dbname = "u599418396_str";
+    // Get database connection details from environment variables (for Coolify)
+    $servername = getenv('DB_HOST') ?: '106.51.142.222';
+    $port = getenv('DB_PORT') ?: '7845';
+    $username = getenv('DB_USERNAME') ?: 'mysql';
+    $password = getenv('DB_PASSWORD') ?: 'vjKSSrMJRPWdMmsb3Kr3bgRrknx6mFOb4qtIaXAMO1ncQ4AVAjlvrKbQW60kX2Zf';
+    $dbname = getenv('DB_DATABASE') ?: 'default';
     
     // If port is specified, add it to the server name for mysqli connection
     $serverWithPort = $servername;
