@@ -1,0 +1,238 @@
+/* Vehicle Form Styles */
+
+.vehicle-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 30px;
+    background-color: #fff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    margin-bottom: 60px;
+    margin-top: 40px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.form-header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+.form-header h1:after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #ff5bae, #fd72cc);
+}
+
+.form-header p {
+    color: #666;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    background: #f9f9f9;
+    color: #333;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #ff5bae;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 91, 174, 0.1);
+    background: #fff;
+}
+
+.form-control:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
+}
+
+.loading-select {
+    background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"%3E%3Cpath fill="none" d="M0 0h24v24H0z"/%3E%3Cpath d="M12 2a10 10 0 0 1 10 10 1 1 0 1 1-2 0 8 8 0 1 0-8 8 1 1 0 1 1 0 2A10 10 0 0 1 12 2zm0 5a5 5 0 0 1 5 5 1 1 0 1 1-2 0 3 3 0 1 0-3 3 1 1 0 1 1 0 2 5 5 0 0 1 0-10z" fill="rgba(255,91,174,1)"/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.info-display {
+    background-color: #f9f9fa;
+    padding: 20px;
+    border-left: 3px solid #ff5bae;
+    margin-bottom: 30px;
+}
+
+.info-display p {
+    margin: 0 0 8px 0;
+    color: #666;
+}
+
+.info-display p:first-child {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #ff5bae, #fd72cc);
+    color: white;
+    min-width: 150px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 91, 174, 0.25);
+}
+
+.btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.form-group.text-center {
+    margin-top: 40px;
+}
+
+.form-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-footer .btn {
+    padding: 10px 25px;
+}
+
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border-radius: 0;
+    color: #fff;
+}
+
+.alert-error {
+    background-color: #f44336;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+}
+
+.alert a {
+    color: #fff;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.alert a:hover {
+    text-decoration: none;
+}
+
+.notification-alert {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    margin-top: 20px;
+    border-left: 3px solid #ff5bae;
+}
+
+.notification-alert i {
+    font-size: 1.5rem;
+    color: #ff5bae;
+    margin-right: 15px;
+}
+
+.notification-alert p {
+    margin: 0;
+    color: #666;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .vehicle-form-container {
+        padding: 30px 20px;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+    }
+    
+    .form-header p {
+        font-size: 1rem;
+    }
+    
+    .form-footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .form-footer .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .vehicle-form-container {
+        padding: 25px 15px;
+    }
+    
+    .form-header h1 {
+        font-size: 1.8rem;
+    }
+} 

@@ -1,0 +1,622 @@
+/* Vehicle Management Styling - Enhanced UI */
+
+/* Custom font import (add Google Fonts for better typography) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Main layout and resets */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #334155;
+    background-color: #f8fafc;
+}
+
+/* Page Layout and Container */
+.admin-content {
+    padding: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Admin header with modern styling */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    position: relative;
+}
+
+.admin-header:after {
+    content: "";
+    height: 4px;
+    width: 60px;
+    background: linear-gradient(90deg, #3498db, #2563eb);
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    border-radius: 2px;
+}
+
+.admin-header h1 {
+    margin: 0;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: -0.5px;
+}
+
+/* Section containers with improved visual design */
+.section {
+    margin-bottom: 40px;
+    border: none;
+    padding: 0;
+    border-radius: 16px;
+    background-color: transparent;
+    box-shadow: none;
+    transition: transform 0.3s ease;
+}
+
+.section > h2 {
+    display: flex;
+    align-items: center;
+    color: #1e293b;
+    margin-bottom: 30px;
+    padding: 0 0 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+.section > h2:before {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #3498db, #2563eb);
+    margin-right: 12px;
+    border-radius: 6px;
+    transform: rotate(45deg);
+}
+
+/* Content card styling for each area */
+.content-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.content-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Headings inside content cards */
+.content-card h3 {
+    color: #0369a1;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.content-card h3:before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 18px;
+    background: linear-gradient(to bottom, #3498db, #0ea5e9);
+    margin-right: 12px;
+    border-radius: 4px;
+}
+
+/* Forms with enhanced styling */
+.form-group {
+    margin-bottom: 25px;
+    max-width: 600px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #475569;
+    font-size: 0.95rem;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+.form-group input[type="text"]:hover,
+.form-group select:hover {
+    border-color: #cbd5e1;
+    background-color: #f1f5f9;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+    background-color: #fff;
+}
+
+/* Form container styling */
+form {
+    background-color: #f8fafc;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+form:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+form .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+/* Data tables with enhanced design */
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background-color: #fff;
+}
+
+.data-table th, 
+.data-table td {
+    padding: 16px 20px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.data-table tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.data-table tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tr:hover {
+    background-color: #eff6ff;
+}
+
+.data-table td {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table td:nth-child(1) {
+    width: 80px;
+    color: #64748b;
+    font-weight: 500;
+    border-right: 1px solid #f1f5f9;
+}
+
+.data-table td:nth-child(2) {
+    font-weight: 500;
+    color: #334155;
+}
+
+.data-table td:last-child {
+    width: 270px;
+}
+
+/* Enhanced buttons with animations and effects */
+button, 
+.btn-view, 
+.btn-edit, 
+.btn-delete,
+.btn-danger,
+.btn-primary,
+a[href].btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    min-width: 110px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+button:after, 
+.btn-view:after, 
+.btn-edit:after, 
+.btn-delete:after,
+.btn-danger:after,
+.btn-primary:after,
+a[href].btn-primary:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+}
+
+button:hover:after,
+.btn-view:hover:after,
+.btn-edit:hover:after,
+.btn-delete:hover:after,
+.btn-danger:hover:after,
+.btn-primary:hover:after,
+a[href].btn-primary:hover:after {
+    transform: translateY(0);
+}
+
+button[type="submit"], 
+.btn-primary {
+    background: linear-gradient(to right, #3498db, #2563eb);
+    color: white;
+}
+
+button[type="submit"]:hover, 
+.btn-primary:hover {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-view {
+    background: linear-gradient(to right, #10b981, #059669);
+    color: white;
+}
+
+.btn-view:hover {
+    background: linear-gradient(to right, #059669, #047857);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(5, 150, 105, 0.3);
+}
+
+.btn-edit {
+    background: linear-gradient(to right, #f59e0b, #d97706);
+    color: white;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(to right, #d97706, #b45309);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(217, 119, 6, 0.3);
+}
+
+.btn-delete {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.3);
+}
+
+/* Better button icons with modern styling */
+.btn-view:before {
+    content: ""; 
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' /%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' /%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.btn-edit:before {
+    content: ""; 
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' /%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.btn-delete:before {
+    content: ""; 
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' /%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+/* Links styling */
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #2563eb;
+}
+
+/* Action buttons container with improved layout */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.action-buttons form {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.action-buttons form:hover {
+    box-shadow: none;
+}
+
+/* Enhanced breadcrumb with modern styling */
+.breadcrumb {
+    margin-bottom: 35px;
+    padding: 16px 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    border-left: 4px solid #3498db;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.breadcrumb a {
+    margin-right: 10px;
+    color: #2563eb;
+    font-weight: 500;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb a:after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-top: 2px solid #94a3b8;
+    border-right: 2px solid #94a3b8;
+    transform: rotate(45deg);
+    margin-left: 10px;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* Enhanced message boxes with animations */
+.success {
+    background-color: #ecfdf5;
+    color: #065f46;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    border-left: 5px solid #10b981;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+.success:before {
+    content: ""; 
+    margin-right: 15px;
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7' /%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+.error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    border-left: 5px solid #ef4444;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
+    animation: slideIn 0.3s ease-out;
+}
+
+.error:before {
+    content: ""; 
+    margin-right: 15px;
+    width: 24px;
+    height: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12' /%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+    margin: 30px 0;
+}
+
+.empty-state p {
+    color: #64748b;
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Empty state style for table messages */
+p:empty + .data-table,
+p:first-of-type:not(:empty) + .data-table {
+    margin-top: 15px;
+}
+
+p:empty {
+    display: none;
+}
+
+/* Improved No-data message */
+p:first-of-type:not(:empty):not(.success):not(.error) {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    color: #64748b;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .section {
+        padding: 0;
+    }
+    
+    .content-card {
+        padding: 20px;
+    }
+    
+    .data-table th, 
+    .data-table td {
+        padding: 12px 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .action-buttons > *:not(:last-child)::after {
+        display: none;
+    }
+    
+    .data-table th, 
+    .data-table td {
+        padding: 10px 12px;
+    }
+    
+    .data-table td:last-child {
+        width: auto;
+    }
+    
+    button, 
+    .btn-view, 
+    .btn-edit, 
+    .btn-delete,
+    .btn-primary,
+    a[href].btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .content-card {
+        padding: 15px;
+    }
+    
+    form {
+        padding: 15px;
+    }
+} 

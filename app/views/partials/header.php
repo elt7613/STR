@@ -1,0 +1,127 @@
+<?php
+// Start the session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Define base URL if not defined
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/');
+}
+
+// Get the current page for active menu highlighting
+$current_page = basename($_SERVER['PHP_SELF']);
+
+// Get all brands for the dropdown menu
+$headerBrands = getAllBrands();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><?php echo isset($page_title) ? $page_title : 'STR Works'; ?></title>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/header.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/footer.css">
+
+    <!-- Custom page styles if needed -->
+    <?php if (isset($custom_css)): ?>
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/<?php echo $custom_css; ?>">
+    <?php endif; ?>
+    
+    <!-- JavaScript -->
+    <script src="<?php echo BASE_URL; ?>assets/js/header.js" defer></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="header">
+        <div class="container header-container">
+            <div class="logo">
+                <img src="<?php echo BASE_URL; ?>assets/img/STR-logo.webp" alt="STRworks India" class="logo-img">
+            </div>
+            
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#" class="nav-link">HOME</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link">ABOUT US</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-toggle="dropdown">BRANDS <i class="fas fa-chevron-down dropdown-icon"></i></a>
+                        <div class="dropdown-menu">
+                            <?php if (!empty($headerBrands)): ?>
+                                <?php foreach ($headerBrands as $brand): ?>
+                                    <a href="<?php echo BASE_URL; ?>brand.php?id=<?php echo $brand['id']; ?>" class="dropdown-item">
+                                        <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="dropdown-item">NO BRANDS AVAILABLE</div>
+                            <?php endif; ?>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="<?php echo BASE_URL; ?>shop.php" class="nav-link">SHOP</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link" data-toggle="dropdown">COMMUNITY <i class="fas fa-chevron-down dropdown-icon"></i></a>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">DEALERS</a>
+                            <a href="#" class="dropdown-item">PREMIUM MEMBERSHIP</a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Header Actions Section -->
+            <div class="header-actions">
+                <div class="cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span class="cart-count">0</span>
+                </div>
+                
+                <?php if (isLoggedIn()): ?>
+                    <div class="user-menu dropdown">
+                        <a href="#" class="nav-link" data-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> 
+                            <span class="username-text"><?php echo htmlspecialchars($_SESSION['username']); ?></span> 
+                            <i class="fas fa-chevron-down dropdown-icon"></i>
+                        </a>
+                        <div class="dropdown-menu">
+                            <a href="<?php echo BASE_URL; ?>vehicle.php" class="dropdown-item">VEHICLE SUBMISSION FORM</a>
+                            <a href="<?php echo BASE_URL; ?>logout.php" class="dropdown-item">LOGOUT</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <a href="<?php echo BASE_URL; ?>index.php" class="login-btn">Login</a>
+                <?php endif; ?>
+            </div>
+            
+            <button class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main>
+
+    <?php if (!empty($error)): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+    <?php endif; ?>
+    
+    <?php if (!empty($success)): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php endif; ?> 

@@ -1,0 +1,41 @@
+# Deny direct access to all PHP files except index.php
+<FilesMatch "\.php$">
+    <Files "index.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <Files "dashboard.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <Files "users.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <Files "submissions.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <Files "edit_user.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <FilesMatch "^(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php)$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+</FilesMatch>
+
+# Block access to sensitive files
+<FilesMatch "\.json$|\.lock$|\.gitignore|composer\.json|composer\.lock|package\.json|package-lock\.json$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protect against directory listing
+Options -Indexes
+
+# Redirect all admin pages to index.php if not directly accessed
+RewriteEngine On
+RewriteCond %{THE_REQUEST} !/(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php) [NC]
+RewriteRule ^(.*)$ index.php [L,R=302] 
