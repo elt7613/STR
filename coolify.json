@@ -6,5 +6,8 @@
   "build": {
     "type": "docker",
     "dockerfilePath": "Dockerfile"
+  },
+  "fileHandlers": {
+    ".php": "application/x-httpd-php"
   }
 } 

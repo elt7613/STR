@@ -4,30 +4,35 @@ RewriteEngine On
 # Handle Authorization Header
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
-# Redirect to index.php if file/directory doesn't exist
-RewriteCond %{REQUEST_FILENAME} !-f
+# Redirect Trailing Slashes If Not A Folder...
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?$1 [L,QSA]
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [L,R=301]
 
-# Force PHP to handle PHP files
-<FilesMatch "\.php$">
-    SetHandler application/x-httpd-php
-</FilesMatch>
+# Serve Existing Files and Directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Additional MIME types for PHP
-AddType application/x-httpd-php .php .phtml
+# Handle Front Controller...
+RewriteRule ^ index.php [L]
 
-# Set PHP settings
-<IfModule mod_php7.c>
-    php_flag display_errors Off
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-</IfModule>
+# Set default handler for PHP files
+AddHandler application/x-httpd-php .php
 
+# PHP settings
 <IfModule mod_php8.c>
     php_flag display_errors Off
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value post_max_size 20M
+    php_value upload_max_filesize 20M
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_value max_execution_time 300
+    php_value post_max_size 20M
+    php_value upload_max_filesize 20M
 </IfModule>
 
 # Set security headers
