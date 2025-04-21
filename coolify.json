@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "type": "service",
+  "port": 80,
+  "publicDirectory": "public",
+  "build": {
+    "type": "docker",
+    "dockerfilePath": "Dockerfile"
+  }
+} 

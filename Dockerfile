@@ -1,55 +1,48 @@
-FROM php:8.1-fpm
+FROM php:8.1-apache
 
-# Install dependencies
+# Install dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
     curl \
-    nginx
+    && docker-php-ext-install pdo_mysql mysqli zip
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mysqli zip
+# Enable Apache modules
+RUN a2enmod rewrite headers
 
-# Copy custom PHP-FPM and nginx configs
-COPY php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
-COPY nginx.conf /etc/nginx/sites-available/default
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-RUN rm -f /etc/nginx/sites-enabled/default.conf
+# Set document root to public directory
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Set working directory
-WORKDIR /var/www/html
+# Create directory for Apache pid file
+RUN mkdir -p /var/run/apache2
 
 # Copy application files
+WORKDIR /var/www/html
 COPY . /var/www/html/
 
-# Create PHP test files
+# Create test files
 RUN echo "<?php phpinfo(); ?>" > /var/www/html/public/info.php
-RUN echo "<?php echo '<h1>PHP is working correctly!</h1>'; ?>" > /var/www/html/public/test.php
-RUN echo "<?php echo 'This is a text file';" > /var/www/html/public/test.txt.php
+RUN echo "<?php echo 'PHP is working correctly!'; ?>" > /var/www/html/public/test.php
 
 # Set permissions - very important for fixing 403 errors
 RUN chown -R www-data:www-data /var/www/html
-RUN find /var/www/html -type d -exec chmod 755 {} \;
+RUN chmod -R 755 /var/www/html
 RUN find /var/www/html -type f -exec chmod 644 {} \;
-RUN chmod 755 /var/www/html/public
 
-# Create and configure log directories
-RUN mkdir -p /var/log/nginx /var/log/php-fpm
-RUN chown -R www-data:www-data /var/log/php-fpm
+# Fix permissions for Apache and add write access to necessary directories
+RUN chmod -R 775 /var/www/html/public
+RUN chmod -R 775 /var/log/ /var/run/
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-echo "Starting nginx..."\n\
-nginx -t\n\
-service nginx start\n\
-echo "Starting PHP-FPM..."\n\
-php-fpm -v\n\
-php-fpm --nodaemonize' > /start.sh
-RUN chmod +x /start.sh
+# Create a modified entry point script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Expose port 80
 EXPOSE 80
 
-# Start services
-CMD ["/start.sh"] 
+# Set the entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"] 
