@@ -1,38 +1,47 @@
-# Enable rewrite engine
+# Enable rewriting
 RewriteEngine On
 
-# Set the base directory
-RewriteBase /
+# Handle Authorization Header
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
-# Prevent direct access to files other than the specified ones
+# Redirect to index.php if file/directory doesn't exist
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^(.*)$ index.php?$1 [L,QSA]
 
-# Protect sensitive files
+# Force PHP to handle PHP files
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+# Additional MIME types for PHP
+AddType application/x-httpd-php .php .phtml
+
+# Set PHP settings
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_flag display_errors Off
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+</IfModule>
+
+# Set security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Deny access to hidden files
 <FilesMatch "^\.">
     Order allow,deny
     Deny from all
 </FilesMatch>
 
 # Set default charset
-AddDefaultCharset UTF-8
-
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# PHP settings
-<IfModule mod_php7.c>
-    php_flag display_errors Off
-    php_flag log_errors On
-    php_value error_log /path/to/error.log
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-    php_value session.cookie_httponly 1
-    php_value session.use_only_cookies 1
-</IfModule> 
+AddDefaultCharset UTF-8 
