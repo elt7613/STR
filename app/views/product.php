@@ -68,9 +68,21 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 </div>
                 
                 <div class="btn-group">
-                    <button class="btn buy-now-btn">
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                    </button>
+                    <?php if (isset($product['direct_buying']) && $product['direct_buying'] == 1): ?>
+                        <button class="btn buy-now-btn">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    <?php else: ?>
+                        <?php if (isLoggedIn()): ?>
+                            <button class="btn request-btn" id="requestProductBtn" data-product-id="<?php echo $product['id']; ?>">
+                                <i class="fas fa-envelope"></i> Request Product
+                            </button>
+                        <?php else: ?>
+                            <a href="/login.php?redirect=<?php echo urlencode('/product.php?id=' . $product['id']); ?>" class="btn request-btn">
+                                <i class="fas fa-sign-in-alt"></i> Login to Request
+                            </a>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -159,5 +171,102 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 quantityInput.value = currentValue + 1;
             }
         });
+        
+        // Request product button
+        const requestBtn = document.getElementById('requestProductBtn');
+        if (requestBtn) {
+            requestBtn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Request...';
+                
+                // Try using the debug endpoint first to test if basic AJAX is working
+                fetch('/debug_request.php')
+                    .then(response => {
+                        console.log('Debug response status:', response.status);
+                        return response.json();
+                    })
+                    .then(debugData => {
+                        console.log('Debug response:', debugData);
+                        
+                        // If debug worked, try the actual request
+                        return fetch('/send_product_request.php?product_id=' + productId);
+                    })
+                    .then(response => {
+                        console.log('Product request status:', response.status);
+                        if (!response.ok) {
+                            throw new Error('Server returned ' + response.status + ': ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.disabled = false;
+                        
+                        if (data.success) {
+                            // Show success message
+                            this.innerHTML = '<i class="fas fa-check"></i> Request Sent';
+                            this.classList.remove('request-btn');
+                            this.classList.add('request-sent-btn');
+                            
+                            // Create alert message
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-success mt-3';
+                            alertDiv.innerHTML = 'Your request has been sent to our team. We will contact you soon.';
+                            
+                            // Insert alert after button
+                            this.closest('.product-actions').insertAdjacentElement('afterend', alertDiv);
+                            
+                            // Auto-hide alert after 5 seconds
+                            setTimeout(() => {
+                                alertDiv.style.transition = 'opacity 0.5s';
+                                alertDiv.style.opacity = '0';
+                                setTimeout(() => alertDiv.remove(), 500);
+                            }, 5000);
+                        } else {
+                            // Show error
+                            this.innerHTML = '<i class="fas fa-envelope"></i> Request';
+                            alert('Failed to send request: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error details:', error);
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-envelope"></i> Request';
+                        alert('Error sending request. Please try again. Details: ' + error.message);
+                    });
+            });
+        }
     });
 </script>
+
+<style>
+    /* Request button styles */
+    .request-btn {
+        background-color: #3498db;
+        color: white;
+        transition: background-color 0.3s ease;
+    }
+    
+    .request-btn:hover {
+        background-color: #2980b9;
+    }
+    
+    .request-sent-btn {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+</style>

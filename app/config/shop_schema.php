@@ -35,6 +35,7 @@ function ensureProductsTableExists($pdo) {
         make_id INT NULL,
         model_id INT NULL,
         series_id INT NULL,
+        direct_buying TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE,
         FOREIGN KEY (make_id) REFERENCES vehicle_makes(id) ON DELETE SET NULL,
@@ -96,6 +97,13 @@ function updateProductsTableWithVehicleFields($pdo) {
             // Add the series_id column
             $pdo->exec("ALTER TABLE products ADD COLUMN series_id INT NULL");
             $pdo->exec("ALTER TABLE products ADD CONSTRAINT fk_product_series FOREIGN KEY (series_id) REFERENCES vehicle_series(id) ON DELETE SET NULL");
+        }
+        
+        // Check if direct_buying column already exists
+        $result = $pdo->query("SHOW COLUMNS FROM products LIKE 'direct_buying'");
+        if ($result->rowCount() == 0) {
+            // Add the direct_buying column
+            $pdo->exec("ALTER TABLE products ADD COLUMN direct_buying TINYINT(1) DEFAULT 0");
         }
     } catch (PDOException $e) {
         echo "Error updating products table: " . $e->getMessage();

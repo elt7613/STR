@@ -12,7 +12,10 @@ require_once __DIR__ . '/../config/database.php';
  * @return array List of all brands
  */
 function getAllBrands() {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) return [];
     
     try {
         $stmt = $pdo->query("SELECT * FROM brands ORDER BY name");
@@ -29,7 +32,10 @@ function getAllBrands() {
  * @return array|false Brand data or false if not found
  */
 function getBrandById($brandId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) return false;
     
     try {
         $stmt = $pdo->prepare("SELECT * FROM brands WHERE id = ?");
@@ -48,11 +54,16 @@ function getBrandById($brandId) {
  * @return array Result with status and message
  */
 function addBrand($name, $image) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
     if (empty($name) || empty($image)) {
         return ['success' => false, 'message' => 'Brand name and image are required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -83,11 +94,16 @@ function addBrand($name, $image) {
  * @return array Result with status and message
  */
 function updateBrand($brandId, $name, $image = null) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
     if (empty($brandId) || empty($name)) {
         return ['success' => false, 'message' => 'Brand ID and name are required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -114,7 +130,12 @@ function updateBrand($brandId, $name, $image = null) {
  * @return array Result with status and message
  */
 function deleteBrand($brandId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         $stmt = $pdo->prepare("DELETE FROM brands WHERE id = ?");
@@ -133,7 +154,12 @@ function deleteBrand($brandId) {
  * @return array List of all products
  */
 function getAllProducts($brandId = null) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         if ($brandId) {
@@ -176,7 +202,12 @@ function getAllProducts($brandId = null) {
  * @return array|false Product data or false if not found
  */
 function getProductById($productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return false;
+    }
     
     try {
         $stmt = $pdo->prepare("
@@ -203,7 +234,12 @@ function getProductById($productId) {
  * @return array List of product images
  */
 function getProductImages($productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC");
@@ -224,9 +260,11 @@ function getProductImages($productId) {
  * @param int|null $makeId Make ID (optional)
  * @param int|null $modelId Model ID (optional)
  * @param int|null $seriesId Series ID (optional)
+ * @param int $directBuying Whether direct buying is enabled (optional, defaults to 0)
  * @return array Result with status and message
  */
-function addProduct($brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null) {
+function addProduct($brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $directBuying = 0) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
@@ -234,13 +272,18 @@ function addProduct($brandId, $title, $amount, $description, $makeId = null, $mo
         return ['success' => false, 'message' => 'All fields are required'];
     }
     
+    // Check if pdo is available
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
     try {
         // Begin transaction
         $pdo->beginTransaction();
         
         // Insert new product
-        $stmt = $pdo->prepare("INSERT INTO products (brand_id, title, amount, description, make_id, model_id, series_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId]);
+        $stmt = $pdo->prepare("INSERT INTO products (brand_id, title, amount, description, make_id, model_id, series_id, direct_buying) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying]);
         $productId = $pdo->lastInsertId();
         
         // Commit transaction
@@ -253,7 +296,9 @@ function addProduct($brandId, $title, $amount, $description, $makeId = null, $mo
         ];
     } catch (PDOException $e) {
         // Rollback transaction
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Failed to add product: ' . $e->getMessage()];
     }
 }
@@ -269,9 +314,11 @@ function addProduct($brandId, $title, $amount, $description, $makeId = null, $mo
  * @param int|null $makeId Make ID (optional)
  * @param int|null $modelId Model ID (optional)
  * @param int|null $seriesId Series ID (optional)
+ * @param int $directBuying Whether direct buying is enabled (optional)
  * @return array Result with status and message
  */
-function updateProduct($productId, $brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null) {
+function updateProduct($productId, $brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $directBuying = 0) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
@@ -279,13 +326,18 @@ function updateProduct($productId, $brandId, $title, $amount, $description, $mak
         return ['success' => false, 'message' => 'All fields are required'];
     }
     
+    // Check if pdo is available
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
     try {
         $stmt = $pdo->prepare("
             UPDATE products 
-            SET brand_id = ?, title = ?, amount = ?, description = ?, make_id = ?, model_id = ?, series_id = ? 
+            SET brand_id = ?, title = ?, amount = ?, description = ?, make_id = ?, model_id = ?, series_id = ?, direct_buying = ? 
             WHERE id = ?
         ");
-        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $productId]);
+        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying, $productId]);
         
         return ['success' => true, 'message' => 'Product updated successfully'];
     } catch (PDOException $e) {
@@ -300,7 +352,12 @@ function updateProduct($productId, $brandId, $title, $amount, $description, $mak
  * @return array Result with status and message
  */
 function deleteProduct($productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         // Begin transaction
@@ -320,7 +377,9 @@ function deleteProduct($productId) {
         return ['success' => true, 'message' => 'Product deleted successfully'];
     } catch (PDOException $e) {
         // Rollback transaction
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Failed to delete product: ' . $e->getMessage()];
     }
 }
@@ -334,7 +393,12 @@ function deleteProduct($productId) {
  * @return array Result with status and message
  */
 function addProductImage($productId, $imagePath, $isPrimary = false) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         // Begin transaction
@@ -356,7 +420,9 @@ function addProductImage($productId, $imagePath, $isPrimary = false) {
         return ['success' => true, 'message' => 'Product image added successfully'];
     } catch (PDOException $e) {
         // Rollback transaction
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Failed to add product image: ' . $e->getMessage()];
     }
 }
@@ -368,7 +434,12 @@ function addProductImage($productId, $imagePath, $isPrimary = false) {
  * @return array Result with status and message
  */
 function deleteProductImage($imageId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         $stmt = $pdo->prepare("DELETE FROM product_images WHERE id = ?");
@@ -388,7 +459,12 @@ function deleteProductImage($imageId) {
  * @return array Result with status and message
  */
 function setImageAsPrimary($imageId, $productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         // Begin transaction
@@ -408,7 +484,9 @@ function setImageAsPrimary($imageId, $productId) {
         return ['success' => true, 'message' => 'Primary image updated successfully'];
     } catch (PDOException $e) {
         // Rollback transaction
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Failed to update primary image: ' . $e->getMessage()];
     }
 }
@@ -423,7 +501,12 @@ function setImageAsPrimary($imageId, $productId) {
  * @return array List of filtered products
  */
 function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = null, $seriesId = null) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $params = [];
@@ -479,7 +562,12 @@ function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = n
  * @return array List of all categories
  */
 function getAllCategories() {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
@@ -496,7 +584,12 @@ function getAllCategories() {
  * @return array|false Category data or false if not found
  */
 function getCategoryById($categoryId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return false;
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT * FROM categories WHERE id = ?");
@@ -515,11 +608,16 @@ function getCategoryById($categoryId) {
  * @return array Result with status and message
  */
 function addCategory($name, $description = '') {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
     if (empty($name)) {
         return ['success' => false, 'message' => 'Category name is required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -550,11 +648,16 @@ function addCategory($name, $description = '') {
  * @return array Result with status and message
  */
 function updateCategory($categoryId, $name, $description = '') {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
     if (empty($categoryId) || empty($name)) {
         return ['success' => false, 'message' => 'Category ID and name are required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -574,7 +677,12 @@ function updateCategory($categoryId, $name, $description = '') {
  * @return array Result with status and message
  */
 function deleteCategory($categoryId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         $stmt = $pdo->prepare("DELETE FROM categories WHERE id = ?");
@@ -593,7 +701,12 @@ function deleteCategory($categoryId) {
  * @return array List of categories associated with the product
  */
 function getProductCategories($productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("
@@ -617,7 +730,12 @@ function getProductCategories($productId) {
  * @return array List of category IDs associated with the product
  */
 function getProductCategoryIds($productId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("
@@ -640,10 +758,15 @@ function getProductCategoryIds($productId) {
  * @return array Result with status and message
  */
 function updateProductCategories($productId, $categoryIds = []) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     if (empty($productId)) {
         return ['success' => false, 'message' => 'Product ID is required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -676,7 +799,9 @@ function updateProductCategories($productId, $categoryIds = []) {
         return ['success' => true, 'message' => 'Product categories updated successfully'];
     } catch (PDOException $e) {
         // Rollback transaction
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Failed to update product categories: ' . $e->getMessage()];
     }
 }
@@ -688,7 +813,12 @@ function updateProductCategories($productId, $categoryIds = []) {
  * @return array List of products in the category
  */
 function getProductsByCategory($categoryId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("

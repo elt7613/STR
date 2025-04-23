@@ -1,0 +1,25 @@
+[2025-04-23 14:03:06] Script started - Product Request
+[2025-04-23 14:03:06] Sending email for product request - Product ID: 10, User ID: 5
+[2025-04-23 14:03:06] About to call sendEmail function
+[2025-04-23 14:03:10] Email function returned: Email sent successfully!
+[2025-04-23 14:03:10] Email sent successfully
+[2025-04-23 14:04:22] Script started - Product Request
+[2025-04-23 14:04:22] Sending email for product request - Product ID: 3, User ID: 5
+[2025-04-23 14:04:22] About to call sendEmail function
+[2025-04-23 14:04:26] Email function returned: Email sent successfully!
+[2025-04-23 14:04:26] Email sent successfully
+[2025-04-23 14:05:14] Script started - Product Request
+[2025-04-23 14:05:14] Sending email for product request - Product ID: 4, User ID: 5
+[2025-04-23 14:05:14] About to call sendEmail function
+[2025-04-23 14:05:18] Email function returned: Email sent successfully!
+[2025-04-23 14:05:18] Email sent successfully
+[2025-04-23 14:07:07] Script started - Product Request
+[2025-04-23 14:07:07] Sending email for product request - Product ID: 4, User ID: 5
+[2025-04-23 14:07:07] About to call sendEmail function
+[2025-04-23 14:07:11] Email function returned: Email sent successfully!
+[2025-04-23 14:07:11] Email sent successfully
+[2025-04-23 14:08:42] Script started - Product Request
+[2025-04-23 14:08:42] Sending email for product request - Product ID: 6, User ID: 5
+[2025-04-23 14:08:42] About to call sendEmail function
+[2025-04-23 14:08:46] Email function returned: Email sent successfully!
+[2025-04-23 14:08:46] Email sent successfully

@@ -16,6 +16,7 @@ require_once __DIR__ . '/../config/database.php';
  * @return array Result with status and message
  */
 function registerUser($username, $email, $password, $phone = '') {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
@@ -29,6 +30,10 @@ function registerUser($username, $email, $password, $phone = '') {
     
     if (strlen($password) < 8) {
         return ['success' => false, 'message' => 'Password must be at least 8 characters'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -59,11 +64,16 @@ function registerUser($username, $email, $password, $phone = '') {
  * @return array Result with status and message
  */
 function loginUser($username, $password) {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // Validate input
     if (empty($username) || empty($password)) {
         return ['success' => false, 'message' => 'Username/email and password are required'];
+    }
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
@@ -112,10 +122,15 @@ function isLoggedIn() {
  * @return bool Whether user is an admin
  */
 function isAdmin() {
+    /** @var \PDO $pdo */
     global $pdo;
     
     // If not logged in, not admin
     if (!isLoggedIn()) {
+        return false;
+    }
+    
+    if (!$pdo) {
         return false;
     }
     
@@ -137,7 +152,12 @@ function isAdmin() {
  * @return array List of all users
  */
 function getAllUsers() {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->query("SELECT id, username, email, created_at, is_admin FROM users ORDER BY id");
@@ -154,7 +174,12 @@ function getAllUsers() {
  * @return string Username or 'Unknown'
  */
 function getUsernameById($userId) {
+    /** @var \PDO $pdo */
     global $pdo;
+    
+    if (!$pdo) {
+        return 'Unknown';
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
@@ -163,6 +188,29 @@ function getUsernameById($userId) {
         return $result ? $result['username'] : 'Unknown';
     } catch (PDOException $e) {
         return 'Unknown';
+    }
+}
+
+/**
+ * Get user details by ID
+ * 
+ * @param int $userId User ID
+ * @return array|false User data or false if not found
+ */
+function getUserById($userId) {
+    /** @var \PDO $pdo */
+    global $pdo;
+    
+    if (!$pdo) {
+        return false;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("SELECT id, username, email, phone, is_admin, created_at FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        return $stmt->fetch();
+    } catch (PDOException $e) {
+        return false;
     }
 }
 

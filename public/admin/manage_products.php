@@ -45,12 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $modelId = !empty($_POST['model_id']) ? intval($_POST['model_id']) : null;
         $seriesId = !empty($_POST['series_id']) ? intval($_POST['series_id']) : null;
         
+        // Get direct_buying value (checkbox)
+        $directBuying = isset($_POST['direct_buying']) ? 1 : 0;
+        
         if (empty($brandId) || empty($title) || $amount <= 0 || empty($description)) {
             $error = 'All fields are required and price must be greater than zero.';
         } else {
             if ($_POST['action'] === 'add') {
                 // Adding new product
-                $result = addProduct($brandId, $title, $amount, $description, $makeId, $modelId, $seriesId);
+                $result = addProduct($brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying);
                 if ($result['success']) {
                     $productId = $result['id'];
                     $success = $result['message'];
@@ -91,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 // Updating existing product
-                $result = updateProduct($productId, $brandId, $title, $amount, $description, $makeId, $modelId, $seriesId);
+                $result = updateProduct($productId, $brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying);
                 if ($result['success']) {
                     $success = $result['message'];
                     

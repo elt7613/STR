@@ -123,6 +123,33 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             </div>
         </div>
         
+        <div class="mb-4">
+            <div class="direct-buying-card">
+                <div class="direct-buying-header">
+                    <div class="direct-buying-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="direct-buying-title">
+                        <h5>Direct Buying</h5>
+                    </div>
+                    <div class="direct-buying-toggle">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="directBuying" name="direct_buying" value="1" 
+                                <?php echo (isset($currentProduct) && isset($currentProduct['direct_buying']) && $currentProduct['direct_buying'] == 1) ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="directBuying">
+                                <span class="toggle-status">
+                                    <?php echo (isset($currentProduct) && isset($currentProduct['direct_buying']) && $currentProduct['direct_buying'] == 1) ? 'Enabled' : 'Disabled'; ?>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="direct-buying-body">
+                    <p>Enable this option to allow customers to purchase the product directly.</p>
+                </div>
+            </div>
+        </div>
+        
         <div class="mb-3">
             <label for="productDescription" class="form-label">Description*</label>
             <textarea class="form-control" id="productDescription" name="description" rows="5" required><?php echo isset($currentProduct) ? htmlspecialchars($currentProduct['description']) : ''; ?></textarea>
@@ -239,7 +266,15 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <span class="text-muted">None specified</span>
                             <?php endif; ?>
                         </td>
-                        <td>$<?php echo number_format($product['amount'], 2); ?></td>
+                        <td>
+                            $<?php echo number_format($product['amount'], 2); ?>
+                            <br>
+                            <?php if (isset($product['direct_buying']) && $product['direct_buying'] == 1): ?>
+                                <span class="badge bg-success"><i class="fas fa-shopping-cart"></i> Direct Buy Enabled</span>
+                            <?php else: ?>
+                                <span class="badge bg-secondary"><i class="fas fa-envelope"></i> Request Only</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo date('M j, Y', strtotime($product['created_at'])); ?></td>
                         <td>
                             <form action="" method="post" class="d-inline">
@@ -366,6 +401,134 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 
 .d-inline {
     display: inline-block;
+}
+
+/* Direct Buying Card Styles */
+.direct-buying-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    overflow: hidden;
+    background-color: #fff;
+    transition: box-shadow 0.3s ease;
+}
+
+.direct-buying-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.direct-buying-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.direct-buying-icon {
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.direct-buying-icon i {
+    font-size: 16px;
+}
+
+.direct-buying-title {
+    flex-grow: 1;
+}
+
+.direct-buying-title h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.direct-buying-toggle {
+    flex-shrink: 0;
+}
+
+.direct-buying-toggle .form-check {
+    min-height: auto;
+    margin: 0;
+}
+
+.direct-buying-toggle .form-check-input {
+    width: 48px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.direct-buying-toggle .form-check-input:checked {
+    background-color: #10b981;
+    border-color: #10b981;
+}
+
+.direct-buying-toggle .toggle-status {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.direct-buying-body {
+    padding: 20px;
+}
+
+.direct-buying-body p {
+    margin-bottom: 12px;
+    color: #475569;
+}
+
+.direct-buying-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    gap: 12px;
+}
+
+.benefit-item {
+    flex: 1 1 30%;
+    min-width: 180px;
+    background-color: #f1f5f9;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #475569;
+}
+
+.benefit-item i {
+    margin-right: 8px;
+    color: #3b82f6;
+}
+
+/* Add responsive adjustments */
+@media (max-width: 768px) {
+    .direct-buying-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .direct-buying-icon {
+        margin-bottom: 12px;
+    }
+    
+    .direct-buying-toggle {
+        margin-top: 12px;
+        align-self: flex-start;
+        width: 100%;
+    }
+    
+    .benefit-item {
+        flex: 1 1 100%;
+    }
 }
 </style>
 
@@ -508,6 +671,16 @@ document.addEventListener('DOMContentLoaded', function() {
         productForm.addEventListener('submit', function(e) {
             console.log('Form submitted via form submit event');
             // Allow the form to submit normally
+        });
+    }
+    
+    // Toggle status label update for direct buying
+    const directBuyingCheckbox = document.getElementById('directBuying');
+    const toggleStatus = document.querySelector('.toggle-status');
+    
+    if (directBuyingCheckbox && toggleStatus) {
+        directBuyingCheckbox.addEventListener('change', function() {
+            toggleStatus.textContent = this.checked ? 'Enabled' : 'Disabled';
         });
     }
 });
