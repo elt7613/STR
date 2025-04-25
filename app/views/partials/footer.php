@@ -17,11 +17,11 @@
                     <div class="footer-links">
                         <h6>LINKS</h6>
                         <ul>
-                            <li><a href="/">Home</a></li>
-                            <li><a href="/services.php">Services</a></li>
-                            <li><a href="/about.php">About Us</a></li>
-                            <li><a href="/shop.php">Shop</a></li>
-                            <li><a href="/contact.php">Contact</a></li>
+                            <li><a href="index.php">Home</a></li>
+                            <li><a href="services.php">Services</a></li>
+                            <li><a href="about.php">About Us</a></li>
+                            <li><a href="shop.php">Shop</a></li>
+                            <li><a href="contact.php">Contact</a></li>
                         </ul>
                     </div>
                 </div>
@@ -29,11 +29,11 @@
                     <div class="footer-brands">
                         <h6>BRANDS</h6>
                         <ul>
-                            <li><a href="/brand.php?id=4">Ultimate9</a></li>
-                            <li><a href="/brand.php?id=5">Offroad Animal</a></li>
-                            <li><a href="/brand.php?id=6">Jmax Engineering</a></li>
-                            <li><a href="/brand.php?id=3">Nashin Brakes</a></li>
-                            <li><a href="/brand.php?id=1">Titan Suspension</a></li>
+                            <li><a href="brand.php?id=4">Ultimate9</a></li>
+                            <li><a href="brand.php?id=5">Offroad Animal</a></li>
+                            <li><a href="brand.php?id=6">Jmax Engineering</a></li>
+                            <li><a href="brand.php?id=3">Nashin Brakes</a></li>
+                            <li><a href="brand.php?id=1">Titan Suspension</a></li>
                         </ul>
                     </div>
                 </div>
@@ -44,11 +44,11 @@
                     </div>
                     <div class="footer-policies">
                         <ul>
-                            <li><a href="/refund-policy.php">Refund Policy</a></li>
-                            <li><a href="/privacy-policy.php">Privacy Policy</a></li>
-                            <li><a href="/cookie-policy.php">Cookie Policy</a></li>
-                            <li><a href="/shipping-policy.php">Shipping Policy</a></li>
-                            <li><a href="/terms-and-conditions.php">Terms and Conditions</a></li>
+                            <li><a href="refund-policy.php">Refund Policy</a></li>
+                            <li><a href="privacy-policy.php">Privacy Policy</a></li>
+                            <li><a href="cookie-policy.php">Cookie Policy</a></li>
+                            <li><a href="shipping-policy.php">Shipping Policy</a></li>
+                            <li><a href="terms-and-conditions.php">Terms and Conditions</a></li>
                         </ul>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
         </div>
     </footer>
 
-    <script src="/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/main.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
 </body>
 </html> 

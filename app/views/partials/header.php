@@ -30,24 +30,24 @@ $headerBrands = getAllBrands();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/header.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/footer.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/header.css">
+    <link rel="stylesheet" href="assets/css/footer.css">
 
     <!-- Custom page styles if needed -->
     <?php if (isset($custom_css)): ?>
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/<?php echo $custom_css; ?>">
+    <link rel="stylesheet" href="assets/css/<?php echo $custom_css; ?>">
     <?php endif; ?>
     
     <!-- JavaScript -->
-    <script src="<?php echo BASE_URL; ?>assets/js/header.js" defer></script>
+    <script src="assets/js/header.js" defer></script>
 </head>
 <body>
     <!-- Navigation Bar -->
     <header class="header">
         <div class="container header-container">
             <div class="logo">
-                <img src="<?php echo BASE_URL; ?>assets/img/STR-logo.webp" alt="STRworks India" class="logo-img">
+                <img src="assets/img/STR-logo.webp" alt="STRworks India" class="logo-img">
             </div>
             
             <nav class="nav">
@@ -59,7 +59,7 @@ $headerBrands = getAllBrands();
                         <div class="dropdown-menu">
                             <?php if (!empty($headerBrands)): ?>
                                 <?php foreach ($headerBrands as $brand): ?>
-                                    <a href="<?php echo BASE_URL; ?>brand.php?id=<?php echo $brand['id']; ?>" class="dropdown-item">
+                                    <a href="brand.php?id=<?php echo $brand['id']; ?>" class="dropdown-item">
                                         <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
                                     </a>
                                 <?php endforeach; ?>
@@ -68,7 +68,7 @@ $headerBrands = getAllBrands();
                             <?php endif; ?>
                         </div>
                     </li>
-                    <li class="nav-item"><a href="<?php echo BASE_URL; ?>shop.php" class="nav-link">SHOP</a></li>
+                    <li class="nav-item"><a href="shop.php" class="nav-link">SHOP</a></li>
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link" data-toggle="dropdown">COMMUNITY <i class="fas fa-chevron-down dropdown-icon"></i></a>
                         <div class="dropdown-menu">
@@ -98,12 +98,12 @@ $headerBrands = getAllBrands();
                             <i class="fas fa-chevron-down dropdown-icon"></i>
                         </a>
                         <div class="dropdown-menu">
-                            <a href="<?php echo BASE_URL; ?>vehicle.php" class="dropdown-item">VEHICLE SUBMISSION FORM</a>
-                            <a href="<?php echo BASE_URL; ?>logout.php" class="dropdown-item">LOGOUT</a>
+                            <a href="vehicle.php" class="dropdown-item">VEHICLE SUBMISSION FORM</a>
+                            <a href="logout.php" class="dropdown-item">LOGOUT</a>
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>index.php" class="login-btn">Login</a>
+                    <a href="index.php" class="login-btn">Login</a>
                 <?php endif; ?>
             </div>
             

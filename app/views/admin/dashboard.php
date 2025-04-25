@@ -9,7 +9,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
     <div class="admin-actions">
-        <a href="/logout.php" class="btn btn-danger">
+        <a href="../logout.php" class="btn btn-danger">
             <i class="fas fa-sign-out-alt"></i> Logout
         </a>
     </div>
@@ -75,19 +75,19 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-quicklinks">
     <h3><i class="fas fa-cogs"></i> Shop Management</h3>
     <div class="quick-action-buttons">
-        <a href="/admin/manage_brands.php" class="quick-action-btn">
+        <a href="manage_brands.php" class="quick-action-btn">
             <i class="fas fa-tags"></i>
             <span>Manage Brands</span>
         </a>
-        <a href="/admin/manage_categories.php" class="quick-action-btn">
+        <a href="manage_categories.php" class="quick-action-btn">
             <i class="fas fa-list"></i>
             <span>Manage Categories</span>
         </a>
-        <a href="/admin/manage_products.php" class="quick-action-btn">
+        <a href="manage_products.php" class="quick-action-btn">
             <i class="fas fa-box"></i>
             <span>Manage Products</span>
         </a>
-        <a href="/admin/manage_vehicles.php" class="quick-action-btn">
+        <a href="manage_vehicles.php" class="quick-action-btn">
             <i class="fas fa-car"></i>
             <span>Manage Vehicles</span>
         </a>
@@ -127,6 +127,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                         <th>ID</th>
                         <th>Username</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Created At</th>
                         <th>Actions</th>
                     </tr>
@@ -144,13 +145,24 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             </div>
                         </td>
                         <td><?php echo htmlspecialchars($user['email']); ?></td>
+                        <td>
+                            <?php if ($user['is_admin'] == 1): ?>
+                                <span class="badge badge-admin">Admin</span>
+                            <?php endif; ?>
+                            <?php if ($user['is_premium_member'] == 1): ?>
+                                <span class="badge badge-premium">Premium</span>
+                            <?php else: ?>
+                                <span class="badge badge-standard">Standard</span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($user['created_at']); ?></td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn btn-primary btn-small edit-user-btn" 
                                         data-user-id="<?php echo $user['id']; ?>"
                                         data-username="<?php echo htmlspecialchars($user['username']); ?>"
-                                        data-email="<?php echo htmlspecialchars($user['email']); ?>">
+                                        data-email="<?php echo htmlspecialchars($user['email']); ?>"
+                                        data-is-premium="<?php echo $user['is_premium_member']; ?>">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                             </div>
@@ -170,7 +182,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             <h3><i class="fas fa-user-edit"></i> Edit User</h3>
             <button class="close-modal"><i class="fas fa-times"></i></button>
         </div>
-        <form id="editUserForm" action="/admin/update_user.php" method="post">
+        <form id="editUserForm" action="update_user.php" method="post">
             <div class="modal-body">
                 <input type="hidden" id="editUserId" name="user_id">
                 
@@ -197,6 +209,14 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                         <input type="password" id="editPassword" name="password" class="form-control">
                     </div>
                     <small class="form-hint">Minimum 8 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Membership Status</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="editIsPremium" name="is_premium_member" value="1">
+                        <label for="editIsPremium">Premium Member</label>
+                    </div>
                 </div>
             </div>
             
@@ -393,7 +413,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             </div>
         </div>
         
-        <a href="/admin/manage_vehicles.php" class="btn btn-primary">
+        <a href="../admin/manage_vehicles.php" class="btn btn-primary">
             <i class="fas fa-car"></i> Go to Vehicle Management
         </a>
     </div>
@@ -434,36 +454,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Open modal when edit button is clicked
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
+            // Get user data from button attributes
             const userId = this.getAttribute('data-user-id');
             const username = this.getAttribute('data-username');
             const email = this.getAttribute('data-email');
+            const isPremium = this.getAttribute('data-is-premium');
             
             // Set values in the form
             userIdField.value = userId;
             usernameField.value = username;
             emailField.value = email;
             
+            // Set membership status
+            const isPremiumCheckbox = document.getElementById('editIsPremium');
+            isPremiumCheckbox.checked = isPremium === '1';
+            
             // Show modal
             editModal.classList.add('active');
         });
     });
     
-    // Close modal when close button is clicked
+    // Close modal when X button is clicked
     if (closeModal) {
         closeModal.addEventListener('click', function() {
             editModal.classList.remove('active');
         });
     }
     
-    // Close modal when cancel button is clicked
+    // Close modal when Cancel button is clicked
     if (cancelBtn) {
         cancelBtn.addEventListener('click', function() {
             editModal.classList.remove('active');
         });
     }
     
-    // Close modal when clicking outside the modal content
-    editModal.addEventListener('click', function(event) {
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
         if (event.target === editModal) {
             editModal.classList.remove('active');
         }

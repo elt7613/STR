@@ -15,6 +15,7 @@ function ensureUsersTableExists($pdo) {
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         is_admin TINYINT(1) DEFAULT 0,
+        is_premium_member TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($sql);
@@ -24,6 +25,16 @@ function ensureUsersTableExists($pdo) {
         $stmt = $pdo->query("SHOW COLUMNS FROM users LIKE 'is_admin'");
         if ($stmt->rowCount() == 0) {
             $pdo->exec("ALTER TABLE users ADD COLUMN is_admin TINYINT(1) DEFAULT 0");
+        }
+    } catch (PDOException $e) {
+        // Column likely already exists or table doesn't exist yet
+    }
+    
+    // Check if is_premium_member column exists, add it if not
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM users LIKE 'is_premium_member'");
+        if ($stmt->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN is_premium_member TINYINT(1) DEFAULT 0");
         }
     } catch (PDOException $e) {
         // Column likely already exists or table doesn't exist yet

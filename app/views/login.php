@@ -49,7 +49,7 @@ require_once __DIR__ . '/partials/header.php';
                 <button type="submit" name="login" class="btn-primary">Sign In</button>
             </div>
             
-            <p class="text-center">Don't have an account? <a href="/register.php">Register here</a></p>
+            <p class="text-center">Don't have an account? <a href="register.php">Register here</a></p>
         </form>
         
         <!-- Optional Social Login - Can be enabled later -->

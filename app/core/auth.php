@@ -13,9 +13,10 @@ require_once __DIR__ . '/../config/database.php';
  * @param string $email User's email
  * @param string $password User's password (will be hashed)
  * @param string $phone User's phone number
+ * @param int $isPremiumMember Premium membership status (0 or 1, defaults to 0)
  * @return array Result with status and message
  */
-function registerUser($username, $email, $password, $phone = '') {
+function registerUser($username, $email, $password, $phone = '', $isPremiumMember = 0) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -47,8 +48,8 @@ function registerUser($username, $email, $password, $phone = '') {
         
         // Insert new user
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, phone) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$username, $email, $hashedPassword, $phone]);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, phone, is_premium_member) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$username, $email, $hashedPassword, $phone, $isPremiumMember]);
         
         return ['success' => true, 'message' => 'Registration successful'];
     } catch (PDOException $e) {
@@ -96,6 +97,7 @@ function loginUser($username, $password) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['phone'] = $user['phone'];
+            $_SESSION['is_premium_member'] = $user['is_premium_member'];
             $_SESSION['loggedin'] = true;
             
             return ['success' => true, 'message' => 'Login successful'];
@@ -160,7 +162,7 @@ function getAllUsers() {
     }
     
     try {
-        $stmt = $pdo->query("SELECT id, username, email, created_at, is_admin FROM users ORDER BY id");
+        $stmt = $pdo->query("SELECT id, username, email, created_at, is_admin, is_premium_member FROM users ORDER BY id");
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];
@@ -206,9 +208,39 @@ function getUserById($userId) {
     }
     
     try {
-        $stmt = $pdo->prepare("SELECT id, username, email, phone, is_admin, created_at FROM users WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, username, email, phone, is_admin, is_premium_member, created_at FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         return $stmt->fetch();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Check if user is a premium member
+ * 
+ * @return bool Whether user is a premium member
+ */
+function isPremiumMember() {
+    /** @var \PDO $pdo */
+    global $pdo;
+    
+    // If not logged in, not a premium member
+    if (!isLoggedIn()) {
+        return false;
+    }
+    
+    if (!$pdo) {
+        return false;
+    }
+    
+    try {
+        // Check if user has premium member status
+        $stmt = $pdo->prepare("SELECT is_premium_member FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch();
+        
+        return $user && isset($user['is_premium_member']) && $user['is_premium_member'] == 1;
     } catch (PDOException $e) {
         return false;
     }

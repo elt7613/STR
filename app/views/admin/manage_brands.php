@@ -9,7 +9,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1><i class="fas fa-tags"></i> Manage Brands</h1>
     <div class="admin-actions">
-        <a href="/admin/dashboard.php" class="btn btn-outline-secondary">
+        <a href="..../admin/dashboard.php" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
@@ -82,7 +82,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <div class="current-image-container">
                         <div class="current-image-label">Current Image:</div>
                         <div class="current-image-preview">
-                            <img src="/<?php echo htmlspecialchars($editBrand['image']); ?>" alt="Current image" class="brand-image-preview">
+                            <img src="../<?php echo htmlspecialchars($editBrand['image']); ?>" alt="Current image" class="brand-image-preview">
                         </div>
                         <small class="text-muted">Upload a new image to replace the current one, or leave blank to keep it.</small>
                     </div>
@@ -96,7 +96,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             </button>
             
             <?php if (isset($_GET['edit'])): ?>
-                <a href="/admin/manage_brands.php" class="btn btn-outline-secondary">
+                <a href="..../admin/manage_brands.php" class="btn btn-outline-secondary">
                     <i class="fas fa-times"></i> Cancel
                 </a>
             <?php endif; ?>
@@ -135,10 +135,10 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <div class="dropdown-menu">
-                                <a href="/admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="dropdown-item">
+                                <a href="..../admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="dropdown-item">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="/brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="dropdown-item">
+                                <a href="..../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="dropdown-item">
                                     <i class="fas fa-eye"></i> View Frontend
                                 </a>
                                 <form action="" method="post" onsubmit="return confirm('Are you sure you want to delete this brand? This will also delete all products associated with this brand.');">
@@ -153,7 +153,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     </div>
                     
                     <div class="brand-image-container">
-                        <img src="/<?php echo htmlspecialchars($brand['image']); ?>" alt="<?php echo htmlspecialchars($brand['name']); ?>" class="brand-card-image">
+                        <img src="../<?php echo htmlspecialchars($brand['image']); ?>" alt="<?php echo htmlspecialchars($brand['name']); ?>" class="brand-card-image">
                     </div>
                     
                     <div class="brand-card-content">
@@ -167,10 +167,10 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     </div>
                     
                     <div class="brand-card-footer">
-                        <a href="/admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="btn btn-sm btn-primary">
+                        <a href="..../admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="btn btn-sm btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <a href="/brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <a href="..../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-eye"></i> View
                         </a>
                     </div>

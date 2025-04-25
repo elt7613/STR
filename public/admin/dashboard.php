@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../includes/init.php';
 // Check if user is admin (you'll need to add this function)
 if (!isAdmin()) {
     // Redirect to home page or show access denied
-    header('Location: /index.php');
+    header('Location: ../index.php');
     exit;
 }
 

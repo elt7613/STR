@@ -26,18 +26,18 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     }
                     ?>
                     
-                    <img id="main-product-image" src="/<?php echo !empty($primaryImage) ? htmlspecialchars($primaryImage['image_path']) : 'assets/img/product-placeholder.jpg'; ?>" class="main-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                    <img id="main-product-image" src="<?php echo !empty($primaryImage) ? htmlspecialchars($primaryImage['image_path']) : 'assets/img/product-placeholder.jpg'; ?>" class="main-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
                 </div>
                 
                 <div class="thumbnail-container">
                     <?php foreach ($productImages as $index => $image): ?>
                         <div class="thumbnail-wrapper <?php echo ($primaryImage && $image['id'] == $primaryImage['id']) ? 'active' : ''; ?>">
-                            <img src="/<?php echo htmlspecialchars($image['image_path']); ?>" class="thumbnail" alt="<?php echo htmlspecialchars($product['title']); ?> - Image <?php echo $index + 1; ?>" onclick="changeMainImage(this)">
+                            <img src="<?php echo htmlspecialchars($image['image_path']); ?>" class="thumbnail" alt="<?php echo htmlspecialchars($product['title']); ?> - Image <?php echo $index + 1; ?>" onclick="changeMainImage(this)">
                         </div>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <img src="/assets/img/product-placeholder.jpg" class="main-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                <img src="assets/img/product-placeholder.jpg" class="main-image" alt="<?php echo htmlspecialchars($product['title']); ?>">
             </div>
             <?php endif; ?>
         </div>
@@ -78,7 +78,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                 <i class="fas fa-envelope"></i> Request Product
                             </button>
                         <?php else: ?>
-                            <a href="/login.php?redirect=<?php echo urlencode('/product.php?id=' . $product['id']); ?>" class="btn request-btn">
+                            <a href="login.php?redirect=<?php echo urlencode('product.php?id=' . $product['id']); ?>" class="btn request-btn">
                                 <i class="fas fa-sign-in-alt"></i> Login to Request
                             </a>
                         <?php endif; ?>
@@ -89,7 +89,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <?php if (!empty($product['brand_id']) && !empty($product['brand_name'])): ?>
             <div class="product-meta">
                 <span class="meta-label">Brand:</span>
-                <a href="/brand.php?id=<?php echo $product['brand_id']; ?>" class="meta-value brand-link"><?php echo htmlspecialchars($product['brand_name']); ?></a>
+                <a href="brand.php?id=<?php echo $product['brand_id']; ?>" class="meta-value brand-link"><?php echo htmlspecialchars($product['brand_name']); ?></a>
             </div>
             <?php endif; ?>
             
@@ -124,9 +124,9 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         <div class="grid-container">
             <?php foreach ($relatedProducts as $relatedProduct): ?>
                 <div class="product-card">
-                    <a href="/product.php?id=<?php echo $relatedProduct['id']; ?>">
+                    <a href="product.php?id=<?php echo $relatedProduct['id']; ?>">
                         <div class="product-image-container">
-                            <img src="/<?php echo !empty($relatedProduct['primary_image']) ? htmlspecialchars($relatedProduct['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($relatedProduct['title']); ?>">
+                            <img src="<?php echo !empty($relatedProduct['primary_image']) ? htmlspecialchars($relatedProduct['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($relatedProduct['title']); ?>">
                         </div>
                         <div class="product-info">
                             <h5 class="product-title"><?php echo htmlspecialchars($relatedProduct['title']); ?></h5>
@@ -183,7 +183,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Request...';
                 
                 // Try using the debug endpoint first to test if basic AJAX is working
-                fetch('/debug_request.php')
+                fetch('debug_request.php')
                     .then(response => {
                         console.log('Debug response status:', response.status);
                         return response.json();
@@ -192,7 +192,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                         console.log('Debug response:', debugData);
                         
                         // If debug worked, try the actual request
-                        return fetch('/send_product_request.php?product_id=' + productId);
+                        return fetch('send_product_request.php?product_id=' + productId);
                     })
                     .then(response => {
                         console.log('Product request status:', response.status);

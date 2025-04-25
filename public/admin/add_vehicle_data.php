@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Vehicle Data - Admin</title>
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -180,7 +180,7 @@
             echo "<li>Models: " . $result['models'] . "</li>";
             echo "<li>Series: " . $result['series'] . "</li>";
             echo "</ul>";
-            echo "<p><a href='/dashboard.php' class='btn'>Return to Dashboard</a></p>";
+            echo "<p><a href='dashboard.php' class='btn'>Return to Dashboard</a></p>";
             echo "</div>";
         } catch (Exception $e) {
             echo "<div class='alert alert-error'>Error: " . $e->getMessage() . "</div>";

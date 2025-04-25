@@ -11,8 +11,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <div class="admin-container">
@@ -30,26 +30,30 @@
                 </div>
             </div>
             <nav class="admin-nav">
-                <a href="/admin/dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
+                <?php 
+                // Get the current script name from the URL
+                $currentScript = basename($_SERVER['SCRIPT_NAME']);
+                ?>
+                <a href="dashboard.php" class="<?php echo $currentScript == 'dashboard.php' ? 'active' : ''; ?>">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
-                <a href="/admin/manage_vehicles.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_vehicles.php' ? 'active' : ''; ?>">
+                <a href="manage_vehicles.php" class="<?php echo $currentScript == 'manage_vehicles.php' ? 'active' : ''; ?>">
                     <i class="fas fa-car"></i> Vehicles
                 </a>
-                <a href="/admin/manage_brands.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_brands.php' ? 'active' : ''; ?>">
+                <a href="manage_brands.php" class="<?php echo $currentScript == 'manage_brands.php' ? 'active' : ''; ?>">
                     <i class="fas fa-tags"></i> Brands
                 </a>
-                <a href="/admin/manage_categories.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_categories.php' ? 'active' : ''; ?>">
+                <a href="manage_categories.php" class="<?php echo $currentScript == 'manage_categories.php' ? 'active' : ''; ?>">
                     <i class="fas fa-list"></i> Categories
                 </a>
-                <a href="/admin/manage_products.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_products.php' ? 'active' : ''; ?>">
+                <a href="manage_products.php" class="<?php echo $currentScript == 'manage_products.php' ? 'active' : ''; ?>">
                     <i class="fas fa-box"></i> Products
                 </a>
                 <div class="nav-divider"></div>
-                <a href="/vehicle.php" target="_blank">
+                <a href="../vehicle.php" target="_blank">
                     <i class="fas fa-external-link-alt"></i> View Frontend
                 </a>
-                <a href="/logout.php" class="logout-link">
+                <a href="../logout.php" class="logout-link">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </nav>

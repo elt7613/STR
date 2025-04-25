@@ -9,9 +9,9 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1>Manage Categories</h1>
     <div>
-        <a href="/admin/manage_brands.php" class="btn btn-primary me-2">Manage Brands</a>
-        <a href="/admin/manage_products.php" class="btn btn-primary me-2">Manage Products</a>
-        <a href="/admin/dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
+        <a href="../admin/manage_brands.php" class="btn btn-primary me-2">Manage Brands</a>
+        <a href="../admin/manage_products.php" class="btn btn-primary me-2">Manage Products</a>
+        <a href="../admin/dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
     </div>
 </div>
 
@@ -50,7 +50,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <button type="submit" class="btn btn-primary"><?php echo $currentCategory ? 'Update Category' : 'Add Category'; ?></button>
                     
                     <?php if ($currentCategory): ?>
-                    <a href="/admin/manage_categories.php" class="btn btn-secondary">Cancel</a>
+                    <a href="../admin/manage_categories.php" class="btn btn-secondary">Cancel</a>
                     <?php endif; ?>
                 </form>
             </div>

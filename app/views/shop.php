@@ -197,7 +197,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div class="brand-products">
                 <div class="brand-header">
                     <h2 class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></h2>
-                    <a href="/brand.php?id=<?php echo $brand['id']; ?>" class="view-more-btn">View More</a>
+                    <a href="brand.php?id=<?php echo $brand['id']; ?>" class="view-more-btn">View More</a>
                 </div>
                 
                 <div class="grid-container">
@@ -218,9 +218,9 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                         foreach ($brandProducts as $product): 
                     ?>
                         <div class="product-card">
-                            <a href="/product.php?id=<?php echo $product['id']; ?>">
+                            <a href="product.php?id=<?php echo $product['id']; ?>">
                                 <div class="product-image-container">
-                                    <img src="/<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                                    <img src="<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                                 </div>
                                 <div class="product-info">
                                     <h5 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h5>

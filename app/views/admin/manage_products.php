@@ -9,9 +9,9 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1>Manage Products</h1>
     <div>
-        <a href="/admin/manage_brands.php" class="btn btn-primary me-2">Manage Brands</a>
-        <a href="/admin/manage_categories.php" class="btn btn-primary me-2">Manage Categories</a>
-        <a href="/admin/dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
+        <a href="../admin/manage_brands.php" class="btn btn-primary me-2">Manage Brands</a>
+        <a href="../admin/manage_categories.php" class="btn btn-primary me-2">Manage Categories</a>
+        <a href="../admin/dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
     </div>
 </div>
 
@@ -163,7 +163,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <?php foreach ($productImages as $image): ?>
                         <div class="product-image-card">
                             <div class="image-container">
-                                <img src="/<?php echo htmlspecialchars($image['image_path']); ?>" alt="Product image" class="product-thumbnail">
+                                <img src="../<?php echo htmlspecialchars($image['image_path']); ?>" alt="Product image" class="product-thumbnail">
                                 <?php if ($image['is_primary'] == 1): ?>
                                     <div class="primary-badge">Primary</div>
                                 <?php endif; ?>
@@ -200,7 +200,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
         </button>
         
         <?php if (isset($currentProduct)): ?>
-            <a href="/admin/manage_products.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+            <a href="../admin/manage_products.php" class="btn btn-outline-secondary ms-2">Cancel</a>
         <?php endif; ?>
     </form>
 </div>
@@ -231,7 +231,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <tr>
                         <td><?php echo $product['id']; ?></td>
                         <td>
-                            <img src="/<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" class="product-image">
+                            <img src="<?php echo !empty($product['primary_image']) ? '../'.htmlspecialchars($product['primary_image']) : '../assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>" class="product-image">
                         </td>
                         <td><?php echo htmlspecialchars($product['title']); ?></td>
                         <td><?php echo htmlspecialchars($product['brand_name']); ?></td>
@@ -293,7 +293,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 </button>
                             </form>
                             
-                            <a href="/product.php?id=<?php echo $product['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
+                            <a href="../product.php?id=<?php echo $product['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-eye"></i> View
                             </a>
                         </td>
@@ -613,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (makeId) {
                 // Fetch models for selected make via AJAX
-                fetch(`/admin/ajax_get_models.php?make_id=${makeId}`)
+                fetch(`../admin/ajax_get_models.php?make_id=${makeId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.models.length > 0) {
@@ -640,7 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (modelId) {
                 // Fetch series for selected model via AJAX
-                fetch(`/admin/ajax_get_series.php?model_id=${modelId}`)
+                fetch(`../admin/ajax_get_series.php?model_id=${modelId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success && data.series.length > 0) {

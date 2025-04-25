@@ -24,13 +24,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = isset($_POST['username']) ? trim($_POST['username']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
+    $isPremiumMember = isset($_POST['is_premium_member']) ? 1 : 0;
     
     // Validate inputs
     if (empty($userId) || empty($username) || empty($email)) {
         $error = 'User ID, username, and email are required.';
     } else {
         // Update user information
-        $result = updateUser($userId, $username, $email, $password);
+        $result = updateUser($userId, $username, $email, $password, $isPremiumMember);
         
         if ($result['success']) {
             $success = $result['message'];
@@ -60,10 +61,16 @@ if (!empty($success)) {
  * @param string $username New username
  * @param string $email New email
  * @param string $password New password (optional)
+ * @param int $isPremiumMember Premium membership status (0 or 1)
  * @return array Result with success status and message
  */
-function updateUser($userId, $username, $email, $password = '') {
+function updateUser($userId, $username, $email, $password = '', $isPremiumMember = 0) {
     global $pdo;
+    
+    // Check if PDO connection exists
+    if (!isset($pdo) || $pdo === null) {
+        return ['success' => false, 'message' => 'Database connection error: PDO variable is not defined.'];
+    }
     
     try {
         // Start transaction
@@ -97,13 +104,13 @@ function updateUser($userId, $username, $email, $password = '') {
             // Hash password
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             
-            // Update username, email, and password
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $hashedPassword, $userId]);
+            // Update username, email, password, and premium status
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, password = ?, is_premium_member = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $hashedPassword, $isPremiumMember, $userId]);
         } else {
-            // Update only username and email
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $userId]);
+            // Update username, email, and premium status
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, is_premium_member = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $isPremiumMember, $userId]);
         }
         
         // Commit transaction
@@ -112,7 +119,9 @@ function updateUser($userId, $username, $email, $password = '') {
         return ['success' => true, 'message' => 'User information updated successfully.'];
     } catch (PDOException $e) {
         // Rollback transaction on error
-        $pdo->rollBack();
+        if (isset($pdo)) {
+            $pdo->rollBack();
+        }
         return ['success' => false, 'message' => 'Database error: ' . $e->getMessage()];
     }
 }

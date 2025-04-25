@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../includes/init.php';
 
 // Check if user is admin, redirect if not
 if (!isAdmin()) {
-    header('Location: /public/index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -272,7 +272,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1>Manage Vehicles</h1>
     <div>
-        <a href="/admin/dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
+        <a href="dashboard.php" class="btn btn-outline-secondary">Back to Dashboard</a>
     </div>
 </div>
 

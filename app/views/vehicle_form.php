@@ -88,8 +88,8 @@ require_once __DIR__ . '/partials/header.php';
                     
                     <?php if (!isLoggedIn()): ?>
                     <div style="margin-top: 20px;">
-                        <a href="/index.php" class="btn" style="margin-right: 10px;">Login</a>
-                        <a href="/register.php" class="btn">Register</a>
+                        <a href="index.php" class="btn" style="margin-right: 10px;">Login</a>
+                        <a href="register.php" class="btn">Register</a>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modelSelect.classList.add('loading-select');
         
         // Fetch models using AJAX
-        fetch('/api/get_models.php?make_id=' + makeId)
+        fetch('api/get_models.php?make_id=' + makeId)
             .then(response => response.json())
             .then(data => {
                 let options = '<option value="">Select Model</option>';
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
         seriesSelect.classList.add('loading-select');
         
         // Fetch series using AJAX
-        fetch('/api/get_series.php?model_id=' + modelId)
+        fetch('api/get_series.php?model_id=' + modelId)
             .then(response => response.json())
             .then(data => {
                 let options = '<option value="">Select Series</option>';

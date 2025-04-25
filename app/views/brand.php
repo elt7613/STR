@@ -18,7 +18,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             
             <div class="collapse show" id="filterCollapse">
                 <div class="filter-body">
-                    <form action="/brand.php" method="get" id="filter-form">
+                    <form action="brand.php" method="get" id="filter-form">
                         <input type="hidden" name="id" value="<?php echo $brandId; ?>">
                         
                         <div class="filter-grid">
@@ -83,7 +83,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                             <button type="submit" class="btn-apply">
                                 <i class="fas fa-check me-2"></i>Apply Filters
                             </button>
-                            <a href="/brand.php?id=<?php echo $brandId; ?>" class="btn-reset">
+                            <a href="brand.php?id=<?php echo $brandId; ?>" class="btn-reset">
                                 <i class="fas fa-undo me-2"></i>Reset
                             </a>
                         </div>
@@ -157,7 +157,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 </span>
                 <?php endif; ?>
                 
-                <a href="/brand.php?id=<?php echo $brandId; ?>" class="clear-all-filters">Clear All</a>
+                <a href="brand.php?id=<?php echo $brandId; ?>" class="clear-all-filters">Clear All</a>
             </div>
         </div>
         <?php endif; ?>
@@ -172,9 +172,9 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <?php if (!empty($products)): ?>
                 <?php foreach ($products as $product): ?>
                     <div class="product-card">
-                        <a href="/product.php?id=<?php echo $product['id']; ?>">
+                        <a href="product.php?id=<?php echo $product['id']; ?>">
                             <div class="product-image-container">
-                                <img src="/<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                                <img src="<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
                             </div>
                             <div class="product-info">
                                 <h5 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h5>
@@ -192,14 +192,14 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                             <p>We've notified our team about your search. We'll consider adding products for this vehicle in the future!</p>
                         </div>
                     <?php endif; ?>
-                    <a href="/brand.php?id=<?php echo $brandId; ?>" class="btn btn-outline-primary mt-3">Clear Filters</a>
+                    <a href="brand.php?id=<?php echo $brandId; ?>" class="btn btn-outline-primary mt-3">Clear Filters</a>
                 </div>
             <?php endif; ?>
         </div>
         
         <!-- Back to Shop Button -->
         <div class="text-center mt-5">
-            <a href="/shop.php" class="back-to-shop">
+            <a href="shop.php" class="back-to-shop">
                 <i class="fas fa-arrow-left me-2"></i>Back to Shop
             </a>
         </div>
@@ -242,7 +242,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             updateSelect(modelSelect, [], 'Loading models...', true);
             
             // Fetch models using AJAX
-            fetch('/api/get_models.php?make_id=' + makeId)
+            fetch('api/get_models.php?make_id=' + makeId)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
@@ -268,7 +268,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             updateSelect(seriesSelect, [], 'Loading series...', true);
             
             // Fetch series using AJAX
-            fetch('/api/get_series.php?model_id=' + modelId)
+            fetch('api/get_series.php?model_id=' + modelId)
                 .then(response => response.json())
                 .then(data => {
                     if (data && data.length > 0) {
