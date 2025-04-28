@@ -28,3 +28,8 @@
 [2025-04-25 00:52:16] About to call sendEmail function
 [2025-04-25 00:52:21] Email function returned: Email sent successfully!
 [2025-04-25 00:52:21] Email sent successfully
+[2025-04-27 19:44:11] Script started - Product Request
+[2025-04-27 19:44:11] Sending email for product request - Product ID: 8, User ID: 5
+[2025-04-27 19:44:11] About to call sendEmail function
+[2025-04-27 19:44:15] Email function returned: Email sent successfully!
+[2025-04-27 19:44:15] Email sent successfully

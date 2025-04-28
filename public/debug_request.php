@@ -1,36 +1,21 @@
 <?php
 /**
- * Diagnostic script to debug product request issues
+ * Debug request endpoint for AJAX debugging
+ * This file returns a simple JSON response to test if AJAX requests are working
  */
 
-// Start output buffering
-ob_start();
+// Set headers for JSON response
+header('Content-Type: application/json');
+header('Cache-Control: no-cache, must-revalidate');
 
-// Basic response function
-function sendResponse($data) {
-    // Clean buffer
-    if (ob_get_length()) ob_clean();
-    
-    // Set headers
-    header('Content-Type: application/json');
-    header('Cache-Control: no-cache, must-revalidate');
-    
-    // Send response
-    echo json_encode($data);
-    exit;
-}
-
-// Create a very simple response to test basic functionality
+// Create a simple response
 $response = [
     'success' => true,
-    'message' => 'Debug response is working',
-    'timestamp' => time(),
-    'test_mode' => true
+    'message' => 'Debug request successful',
+    'timestamp' => date('Y-m-d H:i:s')
 ];
 
-// Step 1: Test basic JSON response
-sendResponse([
-    'step' => 1,
-    'message' => 'Basic JSON response is working'
-]);
+// Return JSON response
+echo json_encode($response);
+exit;
 ?> 

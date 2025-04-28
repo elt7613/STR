@@ -52,7 +52,11 @@
         Order Allow,Deny
         Allow from all
     </Files>
-    <FilesMatch "^(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php|manage_brands\.php|manage_categories\.php|manage_products\.php|manage_vehicles\.php|add_vehicle_data\.php|ajax_get_models\.php|ajax_get_series\.php|update_user\.php)$">
+    <Files "manage_orders.php">
+        Order Allow,Deny
+        Allow from all
+    </Files>
+    <FilesMatch "^(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php|manage_brands\.php|manage_categories\.php|manage_products\.php|manage_vehicles\.php|add_vehicle_data\.php|ajax_get_models\.php|ajax_get_series\.php|update_user\.php|manage_orders\.php)$">
         Order Allow,Deny
         Allow from all
     </FilesMatch>
@@ -69,5 +73,5 @@ Options -Indexes
 
 # Redirect all admin pages to index.php if not directly accessed
 RewriteEngine On
-RewriteCond %{THE_REQUEST} !/(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php|manage_brands\.php|manage_categories\.php|manage_products\.php|manage_vehicles\.php|add_vehicle_data\.php|ajax_get_models\.php|ajax_get_series\.php|update_user\.php) [NC]
+RewriteCond %{THE_REQUEST} !/(index\.php|dashboard\.php|users\.php|submissions\.php|edit_user\.php|manage_brands\.php|manage_categories\.php|manage_products\.php|manage_vehicles\.php|add_vehicle_data\.php|ajax_get_models\.php|ajax_get_series\.php|update_user\.php|manage_orders\.php) [NC]
 RewriteRule ^(.*)$ index.php [L,R=302] 

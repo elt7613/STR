@@ -32,6 +32,20 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 
     <div class="stat-card">
         <div class="stat-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value"><?php echo isset($orderCount) ? intval($orderCount) : 0; ?></div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-change <?php echo isset($orderCount) && $orderCount > 0 ? 'increase' : 'decrease'; ?>">
+            <i class="fas fa-<?php echo isset($orderCount) && $orderCount > 0 ? 'arrow-up' : 'arrow-down'; ?>"></i> 
+            <?php echo isset($pendingOrderCount) && $pendingOrderCount > 0 ? $pendingOrderCount . ' pending' : '0 pending'; ?>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
             <i class="fas fa-car"></i>
         </div>
         <div class="stat-content">
@@ -75,6 +89,10 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-quicklinks">
     <h3><i class="fas fa-cogs"></i> Shop Management</h3>
     <div class="quick-action-buttons">
+        <a href="manage_orders.php" class="quick-action-btn">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Manage Orders</span>
+        </a>
         <a href="manage_brands.php" class="quick-action-btn">
             <i class="fas fa-tags"></i>
             <span>Manage Brands</span>

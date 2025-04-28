@@ -33,6 +33,8 @@ $headerBrands = getAllBrands();
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/header.css">
     <link rel="stylesheet" href="assets/css/footer.css">
+    <!-- Tailwind CSS for cart compatibility -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
     <!-- Custom page styles if needed -->
     <?php if (isset($custom_css)): ?>
@@ -41,6 +43,7 @@ $headerBrands = getAllBrands();
     
     <!-- JavaScript -->
     <script src="assets/js/header.js" defer></script>
+    <script src="assets/js/cart.js" defer></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -81,13 +84,13 @@ $headerBrands = getAllBrands();
             
             <!-- Header Actions Section -->
             <div class="header-actions">
-                <div class="cart">
+                <div class="cart" id="cartButton">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="cart-icon">
                         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <path d="M16 10a4 4 0 0 1-8 0"></path>
                     </svg>
-                    <span class="cart-count">0</span>
+                    <span class="cart-count" id="cartCount"><?php echo getCartItemCount(); ?></span>
                 </div>
                 
                 <?php if (isLoggedIn()): ?>
@@ -98,6 +101,9 @@ $headerBrands = getAllBrands();
                             <i class="fas fa-chevron-down dropdown-icon"></i>
                         </a>
                         <div class="dropdown-menu">
+                            <?php if (isAdmin()): ?>
+                                <a href="admin/dashboard.php" class="dropdown-item">DASHBOARD</a>
+                            <?php endif; ?>
                             <a href="vehicle.php" class="dropdown-item">VEHICLE SUBMISSION FORM</a>
                             <a href="logout.php" class="dropdown-item">LOGOUT</a>
                         </div>
@@ -114,6 +120,22 @@ $headerBrands = getAllBrands();
             </button>
         </div>
     </header>
+    
+    <!-- Cart Dropdown -->
+    <div id="cartDropdown" class="cart-dropdown h-300 mt-4 w-80 bg-black shadow-lg p-4">
+        <div id="cartItems" class="text-white">
+            <!-- Cart items will be dynamically inserted here -->
+            <p class="empty-cart-message">Your cart is empty</p>
+        </div>
+        <div class="flex gap-5">
+            <button class="mt-4 w-3/5 font-semi-bold bg-pink-500 text-white py-2 text-sm view-cart-btn" onclick="window.location.href='cart.php'">
+                VIEW CART
+            </button>
+            <button class="mt-4 w-3/5 font-semi-bold bg-black text-white py-2 text-sm bold border-white border-2 hover:border-pink-500 hover:text-pink-500 transition checkout-btn">
+                CHECKOUT
+            </button>
+        </div>
+    </div>
     
     <!-- Main Content -->
     <main>

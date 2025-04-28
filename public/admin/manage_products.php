@@ -226,6 +226,29 @@ if (isset($_GET['edit']) && !$currentProduct) {
         $productImages = getProductImages($editProductId);
         $productCategories = getProductCategoryIds($editProductId);
         
+        // Return JSON data if format=json is specified
+        if (isset($_GET['format']) && $_GET['format'] === 'json') {
+            header('Content-Type: application/json');
+            
+            // Debug: Log what we're sending
+            error_log('Sending JSON response for product ID: ' . $editProductId);
+            error_log('Categories: ' . json_encode($productCategories));
+            error_log('Images: ' . json_encode($productImages));
+            
+            // Ensure categories are properly formatted as an array of integers
+            $formattedCategories = array_map('intval', $productCategories);
+            
+            $response = [
+                'success' => true,
+                'product' => $currentProduct,
+                'images' => $productImages,
+                'categories' => $formattedCategories
+            ];
+            
+            echo json_encode($response);
+            exit;
+        }
+        
         // Load models and series based on current selection
         if (!empty($currentProduct['make_id'])) {
             $models = getVehicleModelsByMake($currentProduct['make_id']);
@@ -233,6 +256,72 @@ if (isset($_GET['edit']) && !$currentProduct) {
             if (!empty($currentProduct['model_id'])) {
                 $series = getVehicleSeriesByModel($currentProduct['model_id']);
             }
+        }
+    }
+}
+
+// Add JSON response for actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    $jsonResponse = false;
+    $responseData = [
+        'success' => false,
+        'message' => 'Unknown error'
+    ];
+    
+    // Check if this is an AJAX request
+    $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
+    if (strpos($acceptHeader, 'application/json') !== false) {
+        $jsonResponse = true;
+    }
+    
+    // Handle image actions
+    if ($_POST['action'] === 'set_primary') {
+        $imageId = isset($_POST['image_id']) ? intval($_POST['image_id']) : 0;
+        $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+        
+        if (empty($imageId) || empty($productId)) {
+            $responseData['message'] = 'Image ID and Product ID are required.';
+        } else {
+            $result = setImageAsPrimary($imageId, $productId);
+            $responseData['success'] = $result['success'];
+            $responseData['message'] = $result['message'];
+            
+            if ($result['success']) {
+                $responseData['product'] = getProductById($productId);
+                $responseData['images'] = getProductImages($productId);
+                $responseData['categories'] = getProductCategoryIds($productId);
+            }
+        }
+        
+        if ($jsonResponse) {
+            header('Content-Type: application/json');
+            echo json_encode($responseData);
+            exit;
+        }
+    }
+    
+    else if ($_POST['action'] === 'delete_image') {
+        $imageId = isset($_POST['image_id']) ? intval($_POST['image_id']) : 0;
+        $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+        
+        if (empty($imageId)) {
+            $responseData['message'] = 'Image ID is required.';
+        } else {
+            $result = deleteProductImage($imageId);
+            $responseData['success'] = $result['success'];
+            $responseData['message'] = $result['message'];
+            
+            if ($result['success'] && !empty($productId)) {
+                $responseData['product'] = getProductById($productId);
+                $responseData['images'] = getProductImages($productId);
+                $responseData['categories'] = getProductCategoryIds($productId);
+            }
+        }
+        
+        if ($jsonResponse) {
+            header('Content-Type: application/json');
+            echo json_encode($responseData);
+            exit;
         }
     }
 }

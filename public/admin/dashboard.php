@@ -35,6 +35,18 @@ $stmt = $pdo->prepare($query);
 $stmt->execute();
 $productCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
+// Get orders count
+$query = "SELECT COUNT(*) as count FROM orders";
+$stmt = $pdo->prepare($query);
+$stmt->execute();
+$orderCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+// Get pending orders count
+$query = "SELECT COUNT(*) as count FROM orders WHERE status = 'pending'";
+$stmt = $pdo->prepare($query);
+$stmt->execute();
+$pendingOrderCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
 // Get vehicle data counts
 $query = "SELECT 
     (SELECT COUNT(*) FROM vehicle_makes) as makeCount,

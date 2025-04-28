@@ -19,15 +19,20 @@ try {
         $serverWithPort .= ":" . $port;
     }
     
-    // Create MySQLi connection
-    $conn = mysqli_connect($serverWithPort, $username, $password, $dbname);
+    // Set timeout values
+    $timeout = 10; // 10 seconds connection timeout (up from default)
+    
+    // Create MySQLi connection with timeout
+    $conn = mysqli_init();
+    mysqli_options($conn, MYSQLI_OPT_CONNECT_TIMEOUT, $timeout);
+    mysqli_real_connect($conn, $servername, $username, $password, $dbname, $port);
     
     // Check connection
-    if (!$conn) {
+    if (mysqli_connect_errno()) {
         die("MySQLi Connection failed: " . mysqli_connect_error());
     }
 
-    // Create PDO connection
+    // Create PDO connection with increased timeout
     $dsn = "mysql:host={$servername};";
     if (!empty($port)) {
         $dsn .= "port={$port};";
@@ -39,6 +44,9 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
     ];
+    
+    // Add timeout settings directly to the connection string instead of as attributes
+    $dsn .= ";connect_timeout={$timeout}";
     
     $pdo = new PDO($dsn, $username, $password, $options);
     

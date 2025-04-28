@@ -1,0 +1,11 @@
+{
+    "name": "str-works/store",
+    "description": "STR Works Online Store",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "razorpay/razorpay": "^2.0",
+        "phpmailer/phpmailer": "^6.8"
+    },
+    "minimum-stability": "stable"
+} 

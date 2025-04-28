@@ -63,13 +63,13 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div class="product-actions">
                 <div class="quantity-selector">
                     <button class="quantity-btn minus-btn" type="button">-</button>
-                    <input type="number" class="quantity-input" value="1" min="1" max="99">
+                    <input type="number" class="quantity-input" id="product-quantity" value="1" min="1" max="99">
                     <button class="quantity-btn plus-btn" type="button">+</button>
                 </div>
                 
                 <div class="btn-group">
                     <?php if (isset($product['direct_buying']) && $product['direct_buying'] == 1): ?>
-                        <button class="btn buy-now-btn">
+                        <button class="btn buy-now-btn" id="addToCartBtn" data-product-id="<?php echo $product['id']; ?>">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
                     <?php else: ?>
@@ -171,6 +171,65 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 quantityInput.value = currentValue + 1;
             }
         });
+        
+        // Add to cart button
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                const quantity = parseInt(document.getElementById('product-quantity').value);
+                
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding to Cart...';
+                
+                // Call addToCart function from cart.js
+                addToCart(productId, quantity, function(success, data) {
+                    if (success) {
+                        // Show success state
+                        addToCartBtn.innerHTML = '<i class="fas fa-check"></i> Added to Cart';
+                        setTimeout(() => {
+                            addToCartBtn.disabled = false;
+                            addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+                        }, 2000);
+                        
+                        // Create success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success mt-3';
+                        alertDiv.innerHTML = 'Product added to your cart!';
+                        
+                        // Insert alert after button
+                        addToCartBtn.closest('.product-actions').insertAdjacentElement('afterend', alertDiv);
+                        
+                        // Auto-hide alert after 3 seconds
+                        setTimeout(() => {
+                            alertDiv.style.transition = 'opacity 0.5s';
+                            alertDiv.style.opacity = '0';
+                            setTimeout(() => alertDiv.remove(), 500);
+                        }, 3000);
+                    } else {
+                        // Show error state
+                        addToCartBtn.disabled = false;
+                        addToCartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+                        
+                        // Create error message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger mt-3';
+                        alertDiv.innerHTML = 'Error adding to cart: ' + (data.message || 'Unknown error');
+                        
+                        // Insert alert after button
+                        addToCartBtn.closest('.product-actions').insertAdjacentElement('afterend', alertDiv);
+                        
+                        // Auto-hide alert after 5 seconds
+                        setTimeout(() => {
+                            alertDiv.style.transition = 'opacity 0.5s';
+                            alertDiv.style.opacity = '0';
+                            setTimeout(() => alertDiv.remove(), 500);
+                        }, 5000);
+                    }
+                });
+            });
+        }
         
         // Request product button
         const requestBtn = document.getElementById('requestProductBtn');
