@@ -137,5 +137,3 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         </div>
     </div>
 </div>
-
-<?php require_once ROOT_PATH . '/app/views/partials/footer.php'; ?> 

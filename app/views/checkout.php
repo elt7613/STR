@@ -131,17 +131,17 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div class="payment-methods">
                 <h2>Payment</h2>
                 
-                <div class="payment-method">
+                <!-- <div class="payment-method">
                     <label for="payment_cod">
                         <input type="radio" id="payment_cod" name="payment_method" value="cod" form="checkout-form">
                         <span>Cash on delivery</span>
                     </label>
                     <p class="payment-description">Pay with cash upon delivery</p>
-                </div>
+                </div> -->
                 
                 <div class="payment-method">
                     <label for="payment_razorpay">
-                        <input type="radio" id="payment_razorpay" name="payment_method" value="razorpay" form="checkout-form">
+                        <input type="radio" id="payment_razorpay" name="payment_method" value="razorpay" form="checkout-form" checked>
                         <span>Razorpay</span>
                     </label>
                     <div class="payment-logo">
@@ -158,4 +158,3 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 
 <script src="assets/js/checkout.js" defer></script>
 
-<?php require_once ROOT_PATH . '/app/views/partials/footer.php'; ?> 

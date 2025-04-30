@@ -72,10 +72,6 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         
         <!-- Coupon and Actions -->
         <div class="actions-row">
-            <div class="coupon-section">
-                <input type="text" placeholder="Coupon Code" class="coupon-input">
-                <button class="coupon-button">APPLY COUPON</button>
-            </div>
             <div class="cart-actions">
                 <button class="continue-shopping" onclick="window.location.href='shop.php'">CONTINUE SHOPPING</button>
                 <button class="update-cart" id="update-cart-btn">UPDATE CART</button>
@@ -115,5 +111,3 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 </div>
 
 <script src="assets/js/cart-page.js" defer></script>
-
-<?php require_once ROOT_PATH . '/app/views/partials/footer.php'; ?> 

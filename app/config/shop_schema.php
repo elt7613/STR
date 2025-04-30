@@ -218,4 +218,3 @@ ensurePaymentTransactionsTableExists($pdo);
 
 // Update products table with vehicle fields
 updateProductsTableWithVehicleFields($pdo);
-?> 

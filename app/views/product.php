@@ -306,6 +306,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         background-color: #3498db;
         color: white;
         transition: background-color 0.3s ease;
+        border-radius: 0;
     }
     
     .request-btn:hover {
@@ -315,11 +316,12 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
     .request-sent-btn {
         background-color: #27ae60;
         color: white;
+        border-radius: 0;
     }
     
     .alert {
         padding: 12px 15px;
-        border-radius: 5px;
+        border-radius: 0;
         margin-top: 15px;
     }
     

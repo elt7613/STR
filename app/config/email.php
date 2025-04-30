@@ -13,14 +13,14 @@ function sendEmail($subject, $htmlBody, $plainTextBody = '') {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';  
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'djangochatbox@gmail.com';
-        $mail->Password   = 'mbmk cavq qzpv gqai'; 
+        $mail->Username   = 'xaioene@gmail.com';
+        $mail->Password   = 'pddl ihlr ctmi cuwk'; 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;  
 
         $adminEmail = "xaioene@gmail.com";
 
-        $mail->setFrom('djangochatbox@gmail.com', 'NetPy');
+        $mail->setFrom('strworks@gmail.com', 'STR Works');
 
         $mail->addAddress($adminEmail, "Admin"); 
 
@@ -92,12 +92,12 @@ function sendEmailToCustomer($subject, $htmlBody, $toEmail, $toName, $plainTextB
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';  
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'djangochatbox@gmail.com';
-        $mail->Password   = 'mbmk cavq qzpv gqai'; 
+        $mail->Username   = 'xaioene@gmail.com';
+        $mail->Password   = 'pddl ihlr ctmi cuwk';  
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;  
 
-        $mail->setFrom('djangochatbox@gmail.com', 'STR Works');
+        $mail->setFrom('strworks@gmail.com', 'STR Works');
         $mail->addAddress($toEmail, $toName); 
 
         // Email content
@@ -421,4 +421,123 @@ function getLatestPaymentTransaction($orderId) {
         error_log('Error fetching payment transaction: ' . $e->getMessage());
         return null;
     }
+}
+
+/**
+ * Send notification to user about vehicle product search with no results
+ * 
+ * @param array $brand Brand details
+ * @param array $filterDetails Vehicle filter details
+ * @param string $userEmail User's email address
+ * @param string $userName User's name
+ * @param int|null $categoryId Category ID if applied in filter
+ * @param array|null $categories All categories for lookup
+ * @return bool Success status
+ */
+function sendVehicleSearchNotification($brand, $filterDetails, $userEmail, $userName, $categoryId = null, $categories = null) {
+    if (empty($userEmail)) {
+        return false;
+    }
+
+    // Prepare user-friendly email subject
+    $subject = 'Your Vehicle Product Search - STR Works';
+    
+    // Create HTML email with proper styling to avoid spam filters
+    $htmlBody = '
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>STR Works - Search Notification</title>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background-color: #000; color: #fff; padding: 20px; text-align: center; }
+            .header h1 { color: #ff5c8d; margin: 0; }
+            .content { padding: 20px; background-color: #ffffff; }
+            .footer { padding: 20px; text-align: center; font-size: 12px; color: #777; background-color: #f5f5f5; }
+            .pink { color: #ff5c8d; }
+            .search-info { background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #eee; }
+            ul { padding-left: 20px; }
+            li { margin-bottom: 8px; }
+            .btn { display: inline-block; padding: 10px 20px; background-color: #ff5c8d; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
+            .btn:hover { background-color: #ff83c2; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>STR Works</h1>
+            </div>
+            <div class="content">
+                <h2>Thank You For Your Search</h2>
+                <p>Hello ' . htmlspecialchars($userName) . ',</p>
+                <p>Thank you for using our product search. We noticed you were looking for products that we don\'t currently have in our inventory.</p>
+                
+                <div class="search-info">
+                    <h3>Your Search Details:</h3>
+                    <ul>
+                        <li><strong>Brand:</strong> ' . htmlspecialchars($brand['name']) . '</li>';
+    
+    if (isset($filterDetails['make'])) {
+        $htmlBody .= '
+                        <li><strong>Make:</strong> ' . htmlspecialchars($filterDetails['make']) . '</li>';
+    }
+    
+    if (isset($filterDetails['model'])) {
+        $htmlBody .= '
+                        <li><strong>Model:</strong> ' . htmlspecialchars($filterDetails['model']) . '</li>';
+    }
+    
+    if (isset($filterDetails['series'])) {
+        $htmlBody .= '
+                        <li><strong>Series:</strong> ' . htmlspecialchars($filterDetails['series']) . '</li>';
+    }
+    
+    if ($categoryId > 0 && $categories) {
+        foreach ($categories as $category) {
+            if ($category['id'] == $categoryId) {
+                $htmlBody .= '
+                        <li><strong>Category:</strong> ' . htmlspecialchars($category['name']) . '</li>';
+                break;
+            }
+        }
+    }
+    
+    $baseUrl = getBaseUrlForEmail();
+    
+    $htmlBody .= '
+                    </ul>
+                </div>
+                
+                <p>We\'ve taken note of your search and will consider adding these products to our inventory in the future.</p>
+                <p>Thank you for your interest in STR Works products!</p>
+            </div>
+            <div class="footer">
+                <p>&copy; ' . date('Y') . ' STR Works. All rights reserved.</p>
+                <p>This email was sent to you because you searched for products on our website.</p>
+            </div>
+        </div>
+    </body>
+    </html>';
+    
+    // Send email to the user
+    return sendEmailToCustomer($subject, $htmlBody, $userEmail, $userName);
+}
+
+/**
+ * Helper function to get the base URL for emails
+ */
+function getBaseUrlForEmail() {
+    // Try to get the server name and protocol
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'example.com';
+    $path = isset($_SERVER['PHP_SELF']) ? dirname($_SERVER['PHP_SELF']) : '';
+    
+    // Normalize path ending
+    $path = rtrim($path, '/') . '/';
+    
+    // Return full base URL
+    return $protocol . $host . $path;
 }

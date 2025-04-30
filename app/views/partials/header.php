@@ -23,6 +23,9 @@ $headerBrands = getAllBrands();
 
     <title><?php echo isset($page_title) ? $page_title : 'STR Works'; ?></title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="assets/img/STR-logo.webp">
+
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
@@ -50,17 +53,37 @@ $headerBrands = getAllBrands();
     <header class="header">
         <div class="container header-container">
             <div class="logo">
-                <img src="assets/img/STR-logo.webp" alt="STRworks India" class="logo-img">
+                <a href="https://strworks.netpy.in/">
+                    <img src="assets/img/STR-logo.webp" alt="STRworks India" class="logo-img">
+                </a>
             </div>
             
             <nav class="nav">
                 <ul class="nav-list">
-                    <li class="nav-item"><a href="#" class="nav-link">HOME</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">ABOUT US</a></li>
+                    <li class="nav-item"><a href="https://strworks.netpy.in/" class="nav-link">HOME</a></li>
+                    <li class="nav-item"><a href="https://strworks.netpy.in/about-us/" class="nav-link">ABOUT US</a></li>
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link" data-toggle="dropdown">BRANDS <i class="fas fa-chevron-down dropdown-icon"></i></a>
                         <div class="dropdown-menu">
-                            <?php if (!empty($headerBrands)): ?>
+                            <a href="https://strworks.netpy.in/titan-suspension/" class="dropdown-item">
+                                TITAN SUSPENSION
+                            </a>
+                            <a href="https://strworks.netpy.in/haltech/" class="dropdown-item">
+                                HALTECH
+                            </a>
+                            <a href="https://strworks.netpy.in/nashin-brakes/" class="dropdown-item">
+                                NASHIN BRAKES
+                            </a>
+                            <a href="https://strworks.netpy.in/ultimate9/" class="dropdown-item">
+                                ULTIMATE9
+                            </a>
+                            <a href="https://strworks.netpy.in/offroad-animal/" class="dropdown-item">
+                                OFFROAD ANIMAL
+                            </a>
+                            <a href="https://strworks.netpy.in/jmax-engineering/" class="dropdown-item">
+                                JMAX ENGINEERING
+                            </a>
+                            <!-- <?php if (!empty($headerBrands)): ?>
                                 <?php foreach ($headerBrands as $brand): ?>
                                     <a href="brand.php?id=<?php echo $brand['id']; ?>" class="dropdown-item">
                                         <?php echo strtoupper(htmlspecialchars($brand['name'])); ?>
@@ -68,15 +91,15 @@ $headerBrands = getAllBrands();
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <div class="dropdown-item">NO BRANDS AVAILABLE</div>
-                            <?php endif; ?>
+                            <?php endif; ?> -->
                         </div>
                     </li>
                     <li class="nav-item"><a href="shop.php" class="nav-link">SHOP</a></li>
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link" data-toggle="dropdown">COMMUNITY <i class="fas fa-chevron-down dropdown-icon"></i></a>
                         <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">DEALERS</a>
-                            <a href="#" class="dropdown-item">PREMIUM MEMBERSHIP</a>
+                            <a href="https://strworks.netpy.in/dealers/" class="dropdown-item">DEALERS</a>
+                            <a href="https://strworks.netpy.in/premium-membership/" class="dropdown-item">PREMIUM MEMBERSHIP</a>
                         </div>
                     </li>
                 </ul>
@@ -104,12 +127,11 @@ $headerBrands = getAllBrands();
                             <?php if (isAdmin()): ?>
                                 <a href="admin/dashboard.php" class="dropdown-item">DASHBOARD</a>
                             <?php endif; ?>
-                            <a href="vehicle.php" class="dropdown-item">VEHICLE SUBMISSION FORM</a>
                             <a href="logout.php" class="dropdown-item">LOGOUT</a>
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="index.php" class="login-btn">Login</a>
+                    <a href="index.php?redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="login-btn">Login</a>
                 <?php endif; ?>
             </div>
             

@@ -72,4 +72,3 @@ function populateVehicleMakes($pdo) {
 
 // Call the function to populate makes
 populateVehicleMakes($pdo);
-?> 

@@ -33,3 +33,35 @@
 [2025-04-27 19:44:11] About to call sendEmail function
 [2025-04-27 19:44:15] Email function returned: Email sent successfully!
 [2025-04-27 19:44:15] Email sent successfully
+[2025-04-29 19:43:28] Script started - Product Request
+[2025-04-29 19:43:28] Sending email for product request - Product ID: 8, User ID: 10
+[2025-04-29 19:43:28] About to call sendEmail function
+[2025-04-29 19:43:31] Email function returned: Failed to send email. Error: SMTP Error: data not accepted. SMTP server error: DATA command failed Detail: Daily user sending limit exceeded. For more information on Gmail
+sending limits go to
+ https://support.google.com/a/answer/166852 41be03b00d2f7-b15f770302csm9030773a12.12 - gsmtp
+ SMTP code: 550 Additional SMTP info: 5.4.5
+[2025-04-29 19:43:31] Email sending failed: Failed to send email. Error: SMTP Error: data not accepted. SMTP server error: DATA command failed Detail: Daily user sending limit exceeded. For more information on Gmail
+sending limits go to
+ https://support.google.com/a/answer/166852 41be03b00d2f7-b15f770302csm9030773a12.12 - gsmtp
+ SMTP code: 550 Additional SMTP info: 5.4.5
+[2025-04-29 19:43:54] Script started - Product Request
+[2025-04-29 19:43:54] Sending email for product request - Product ID: 8, User ID: 10
+[2025-04-29 19:43:54] About to call sendEmail function
+[2025-04-29 19:43:57] Email function returned: Failed to send email. Error: SMTP Error: data not accepted. SMTP server error: DATA command failed Detail: Daily user sending limit exceeded. For more information on Gmail
+sending limits go to
+ https://support.google.com/a/answer/166852 d2e1a72fcca58-73e25941be8sm10305110b3a.58 - gsmtp
+ SMTP code: 550 Additional SMTP info: 5.4.5
+[2025-04-29 19:43:57] Email sending failed: Failed to send email. Error: SMTP Error: data not accepted. SMTP server error: DATA command failed Detail: Daily user sending limit exceeded. For more information on Gmail
+sending limits go to
+ https://support.google.com/a/answer/166852 d2e1a72fcca58-73e25941be8sm10305110b3a.58 - gsmtp
+ SMTP code: 550 Additional SMTP info: 5.4.5
+[2025-04-30 16:07:40] Script started - Product Request
+[2025-04-30 16:07:40] Sending email for product request - Product ID: 3, User ID: 5
+[2025-04-30 16:07:40] About to call sendEmail function
+[2025-04-30 16:07:45] Email function returned: Email sent successfully!
+[2025-04-30 16:07:45] Email sent successfully
+[2025-04-30 16:11:41] Script started - Product Request
+[2025-04-30 16:11:42] Sending email for product request - Product ID: 8, User ID: 5
+[2025-04-30 16:11:42] About to call sendEmail function
+[2025-04-30 16:11:46] Email function returned: Email sent successfully!
+[2025-04-30 16:11:46] Email sent successfully

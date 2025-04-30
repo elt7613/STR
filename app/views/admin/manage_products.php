@@ -22,15 +22,6 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <?php if (!empty($success)): ?>
     <div class="alert alert-success"><?php echo $success; ?></div>
 <?php endif; ?>
-
-<!-- Debug: Manual modal trigger button to test if modal is working -->
-<div class="debug-section mb-3">
-    <button type="button" class="btn btn-info" id="testModalButton">
-        Test Edit Modal
-    </button>
-    <small class="text-muted ms-2">This button is for testing the modal functionality</small>
-</div>
-
 <!-- Add/Edit Product Form -->
 <div class="form-section">
     <h3><?php echo isset($currentProduct) ? 'Edit Product: ' . htmlspecialchars($currentProduct['title']) : 'Add New Product'; ?></h3>
@@ -753,55 +744,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('jQuery Bootstrap detected');
     } else {
         console.warn('WARNING: Bootstrap JavaScript not detected. Modals may not work correctly.');
-    }
-    
-    // Debug: Test modal button
-    const testModalButton = document.getElementById('testModalButton');
-    if (testModalButton) {
-        testModalButton.addEventListener('click', function() {
-            console.log('Test modal button clicked');
-            const modalElement = document.getElementById('editProductModal');
-            
-            if (!modalElement) {
-                console.error('Modal element not found!');
-                alert('Modal element not found!');
-                return;
-            }
-            
-            console.log('Modal element found, attempting to show');
-            
-            // Try different methods to show the modal
-            try {
-                // Bootstrap 5 method
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
-                console.log('Modal shown via Bootstrap 5 API');
-            } catch (e) {
-                console.log('Bootstrap 5 method failed:', e);
-                
-                try {
-                    // jQuery method
-                    $(modalElement).modal('show');
-                    console.log('Modal shown via jQuery');
-                } catch (e2) {
-                    console.error('All methods failed:', e2);
-                    
-                    // Last resort method
-                    try {
-                        modalElement.classList.add('show');
-                        modalElement.style.display = 'block';
-                        document.body.classList.add('modal-open');
-                        const backdrop = document.createElement('div');
-                        backdrop.className = 'modal-backdrop fade show';
-                        document.body.appendChild(backdrop);
-                        console.log('Modal shown via direct DOM manipulation');
-                    } catch (e3) {
-                        console.error('Even direct manipulation failed:', e3);
-                        alert('Failed to show modal: ' + e3.message);
-                    }
-                }
-            }
-        });
     }
     
     // Edit product button click handler

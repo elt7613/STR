@@ -61,19 +61,19 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
     }
     
     .view-more-btn {
-        background-color: transparent;
-        color: #ff5bae;
-        border: 2px solid #ff5bae;
+        background-color: #d2d2d2;
+        color: black;
+        border: 2px solid #d2d2d2;
         padding: 10px 25px;
-        border-radius: 25px;
+        border-radius: 0;
         transition: all 0.3s ease;
         text-decoration: none;
         font-weight: 500;
     }
     
     .view-more-btn:hover {
-        background-color: #fd72cc;
-        border-color: #fd72cc;
+        background-color: #ff83c2;
+        border-color: #ff83c2;
         color: white;
         transform: translateY(-2px);
     }

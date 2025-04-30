@@ -49,9 +49,8 @@ require_once ROOT_PATH . '/app/config/shop_schema.php';
 // Include authentication functions
 require_once ROOT_PATH . '/app/core/auth.php';
 
-// Include vehicle functions
-require_once ROOT_PATH . '/app/core/vehicle.php';
-
 // Include shop functions
 require_once ROOT_PATH . '/app/core/shop.php';
+
+require_once ROOT_PATH . '/app/core/vehicle.php';
 ?> 

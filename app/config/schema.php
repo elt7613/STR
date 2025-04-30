@@ -72,4 +72,3 @@ function ensureUsersTableExists($pdo) {
 
 // Create users table if it doesn't exist
 ensureUsersTableExists($pdo);
-?> 

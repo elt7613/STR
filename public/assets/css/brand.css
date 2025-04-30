@@ -153,7 +153,7 @@
     background: linear-gradient(90deg, #ff5bae, #fd72cc);
     border: none;
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: 0;
     transition: all 0.3s ease;
     font-weight: 600;
 }
@@ -168,7 +168,7 @@
     border: 1px solid #ced4da;
     color: #6c757d;
     padding: 12px 24px;
-    border-radius: 8px;
+    border-radius: 0;
     transition: all 0.3s ease;
     font-weight: 500;
 }
@@ -282,7 +282,7 @@
     color: white;
     border: none;
     padding: 12px 20px;
-    border-radius: 8px;
+    border-radius: 0;
     transition: all 0.3s ease;
     width: 100%;
     font-weight: 600;
@@ -306,7 +306,7 @@
     border: none;
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -327,20 +327,20 @@
     margin-top: 30px;
     text-align: center;
     padding: 14px 35px;
-    background: #ffffff;
-    color: #555;
+    background: #d2d2d2;
+    color: black;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 0;
     transition: all 0.3s ease;
-    border: 2px solid #f0f0f0;
+    border: 2px solid #d2d2d2;
     text-decoration: none;
     box-shadow: 0 5px 15px rgba(0,0,0,0.04);
 }
 
 .back-to-shop:hover {
-    background-color: #f8f9fa;
-    color: #ff5bae;
-    border-color: #ffcce7;
+    background-color: #ff83c2;
+    color: white;
+    border-color: #ff83c2;
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
@@ -796,7 +796,7 @@
     color: white;
     border: none;
     padding: 12px 25px;
-    border-radius: 8px;
+    border-radius: 0;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
@@ -817,7 +817,7 @@
     background-color: transparent;
     color: #666;
     padding: 12px 25px;
-    border-radius: 8px;
+    border-radius: 0;
     font-weight: 500;
     font-size: 0.95rem;
     cursor: pointer;
@@ -861,7 +861,7 @@
     background-color: #fff;
     color: #333;
     padding: 8px 15px;
-    border-radius: 50px;
+    border-radius: 0;
     font-size: 0.85rem;
     font-weight: 500;
     display: inline-flex;
@@ -908,7 +908,7 @@
     font-weight: 600;
     text-decoration: none;
     padding: 8px 15px;
-    border-radius: 50px;
+    border-radius: 0;
     background-color: rgba(255, 91, 174, 0.08);
     transition: all 0.2s ease;
     margin-left: auto;

@@ -1,5 +1,5 @@
 <?php
-// Test file to mimic application pages like vehicle.php
+// Test file to mimic application pages like shop.php
 
 // Start output buffering to ensure headers can be sent
 ob_start();
@@ -23,7 +23,7 @@ header('Content-Type: text/html; charset=utf-8');
     <h1>Application Page Test</h1>
     
     <div class="box">
-        <p class="success">This mimics an application page like vehicle.php!</p>
+        <p class="success">This mimics an application page like shop.php!</p>
         <p>If you see this instead of being prompted to download the file, PHP processing is working correctly.</p>
         <p>This file (page-test.php) is specifically designed to test if PHP files are being processed properly.</p>
         <hr>
@@ -46,7 +46,7 @@ header('Content-Type: text/html; charset=utf-8');
         <h2>Next Steps</h2>
         <p>If this page displays correctly, try accessing these other files:</p>
         <ul>
-            <li><a href="vehicle.php">vehicle.php</a> - Your actual application page</li>
+            <li><a href="shop.php">shop.php</a> - Your actual application page</li>
             <li><a href="debug.php">debug.php</a> - Technical diagnostic information</li>
             <li><a href="direct-test.php">direct-test.php</a> - Another PHP test</li>
         </ul>

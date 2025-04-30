@@ -200,7 +200,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         <!-- Back to Shop Button -->
         <div class="text-center mt-5">
             <a href="shop.php" class="back-to-shop">
-                <i class="fas fa-arrow-left me-2"></i>Back to Shop
+                <i class="fas fa-arrow-left me-2"></i> Back to Shop
             </a>
         </div>
     </div>

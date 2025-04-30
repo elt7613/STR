@@ -169,8 +169,31 @@ if ($vehicleFilterApplied && $noProductsFound) {
     $htmlBody .= '<li><strong>Date/Time:</strong> ' . date('Y-m-d H:i:s') . '</li>';
     $htmlBody .= '</ul>';
     
-    // Send the email notification
+    // Send the email notification to admin
     sendEmail($subject, $htmlBody);
+    
+    // Also send notification to the user if they're logged in
+    if ($userInfo['is_logged_in'] && !empty($userInfo['email'])) {
+        // Use the centralized function to send notification to user
+        sendVehicleSearchNotification(
+            $brand, 
+            $filterDetails, 
+            $userInfo['email'], 
+            $userInfo['username'], 
+            $categoryId, 
+            $categories
+        );
+    }
+}
+
+/**
+ * Helper function to get the base URL
+ */
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = dirname($_SERVER['PHP_SELF']);
+    return $protocol . $host . $path . '/';
 }
 
 // Include brand view

@@ -10,11 +10,19 @@ require_once __DIR__ . '/../includes/init.php';
 $error = '';
 $success = '';
 
-// Store the referring page in session if it's not already set and if it's not the registration or login page itself
-if (!isset($_SESSION['referring_page']) && isset($_SERVER['HTTP_REFERER'])) {
+// Store the referring page in session if it's not already set
+if (isset($_GET['redirect']) && !empty($_GET['redirect'])) {
+    // Use the explicit redirect parameter if provided
+    $_SESSION['referring_page'] = urldecode($_GET['redirect']);
+} elseif (!isset($_SESSION['referring_page']) && isset($_SERVER['HTTP_REFERER'])) {
     $referer = $_SERVER['HTTP_REFERER'];
-    // Make sure we're not storing the register or login page itself as the referrer
-    if (strpos($referer, 'index.php') === false && strpos($referer, 'register.php') === false) {
+    $host = $_SERVER['HTTP_HOST'];
+    
+    // Make sure it's from our own site and not the login or register page
+    if (strpos($referer, $host) !== false && 
+        strpos($referer, 'index.php') === false && 
+        strpos($referer, 'register.php') === false && 
+        strpos($referer, 'logout.php') === false) {
         $_SESSION['referring_page'] = $referer;
     }
 }
@@ -45,9 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// If user is already logged in, redirect to referring page or vehicle page
+// If user is already logged in, redirect to referring page or shop page
 if (isLoggedIn()) {
-    $redirect_to = isset($_SESSION['referring_page']) ? $_SESSION['referring_page'] : 'vehicle.php';
+    $redirect_to = isset($_SESSION['referring_page']) && !empty($_SESSION['referring_page']) 
+        ? $_SESSION['referring_page'] 
+        : 'shop.php';
     unset($_SESSION['referring_page']); // Clear the referring page after use
     header('Location: ' . $redirect_to);
     exit;

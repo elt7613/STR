@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle ?? 'Admin Panel'; ?> - STR Admin</title>
+   
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="assets/img/STR-logo.webp">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +24,7 @@
     <div class="admin-container">
         <div class="admin-sidebar">
             <div class="admin-logo">
-                <i class="fas fa-car-side"></i> STR Admin
+                <img src="../assets/img/STR-logo.webp" alt="STR Logo" style="max-width: 100%; height: auto; max-height: 40px;">
             </div>
             <div class="admin-user-info">
                 <div class="admin-user-avatar">
@@ -55,7 +59,7 @@
                     <i class="fas fa-box"></i> Products
                 </a>
                 <div class="nav-divider"></div>
-                <a href="../vehicle.php" target="_blank">
+                <a href="../shop.php" target="_blank">
                     <i class="fas fa-external-link-alt"></i> View Frontend
                 </a>
                 <a href="../logout.php" class="logout-link">

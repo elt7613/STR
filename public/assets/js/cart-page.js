@@ -199,11 +199,8 @@ function updateCart() {
             // Show success message
             showNotification('Cart updated successfully', 'success');
             
-            // Reset button state
-            if (updateBtn) {
-                updateBtn.disabled = false;
-                updateBtn.textContent = 'UPDATE CART';
-            }
+            // Refresh the page
+            window.location.reload();
         })
         .catch(function(error) {
             // Show error message

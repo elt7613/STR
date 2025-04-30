@@ -515,7 +515,8 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
+    margin-right: 15px;
 }
 
 .customer-name {
@@ -569,7 +570,9 @@
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border-radius: 0;
+    margin-bottom: 15px;
+    background-color: #f9f9fa;
     transition: all 0.3s ease;
 }
 
@@ -599,13 +602,15 @@
 }
 
 .submit-review-btn {
-    background: linear-gradient(90deg, #ff5bae, #fd72cc);
+    background-color: #ff5bae;
     color: white;
     border: none;
-    padding: 12px 30px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    padding: 12px 35px;
+    border-radius: 0;
     font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .submit-review-btn:hover {
