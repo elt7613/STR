@@ -23,14 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && ($_POST['action'] === 'add' || $_POST['action'] === 'update')) {
         $categoryId = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
         $name = $_POST['name'] ?? '';
+        $brandId = isset($_POST['brand_id']) ? intval($_POST['brand_id']) : 0;
         $description = $_POST['description'] ?? '';
         
         if (empty($name)) {
             $error = 'Category name is required.';
+        } else if (empty($brandId)) {
+            $error = 'Brand is required.';
         } else {
             if ($_POST['action'] === 'add') {
                 // Adding new category
-                $result = addCategory($name, $description);
+                $result = addCategory($name, $brandId, $description);
                 if ($result['success']) {
                     $success = $result['message'];
                 } else {
@@ -38,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 // Updating existing category
-                $result = updateCategory($categoryId, $name, $description);
+                $result = updateCategory($categoryId, $name, $brandId, $description);
                 if ($result['success']) {
                     $success = $result['message'];
                 } else {
@@ -82,8 +85,14 @@ if (isset($_GET['edit']) && !$currentCategory) {
     }
 }
 
-// Get all categories for display
-$categories = getAllCategories();
+// Filter by brand if specified
+$filterBrandId = isset($_GET['brand_id']) ? intval($_GET['brand_id']) : 0;
+
+// Get all brands for dropdown
+$brands = getAllBrands();
+
+// Get all categories for display (filtered by brand if specified)
+$categories = $filterBrandId > 0 ? getAllCategories($filterBrandId) : getAllCategories();
 
 // Include admin categories view
 require_once ROOT_PATH . '/app/views/admin/manage_categories.php';

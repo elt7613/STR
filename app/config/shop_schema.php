@@ -18,9 +18,12 @@ function ensureBrandsTableExists($pdo) {
 function ensureCategoriesTableExists($pdo) {
     $sql = "CREATE TABLE IF NOT EXISTS categories (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE,
+        name VARCHAR(100) NOT NULL,
         description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        brand_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_category_name_per_brand (name, brand_id)
     )";
     $pdo->exec($sql);
 }
@@ -220,6 +223,32 @@ function updateOrdersTableWithGSTField($pdo) {
     }
 }
 
+// Function to update categories table with brand_id field if it doesn't exist
+function updateCategoriesTableWithBrandField($pdo) {
+    try {
+        // Check if brand_id column already exists
+        $result = $pdo->query("SHOW COLUMNS FROM categories LIKE 'brand_id'");
+        if ($result->rowCount() == 0) {
+            // Add the brand_id column
+            $pdo->exec("ALTER TABLE categories ADD COLUMN brand_id INT NOT NULL DEFAULT 1");
+            $pdo->exec("ALTER TABLE categories ADD CONSTRAINT fk_category_brand FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE CASCADE");
+            
+            // Remove unique constraint on name (if it exists) and add composite unique key
+            try {
+                $pdo->exec("ALTER TABLE categories DROP INDEX name");
+            } catch (PDOException $e) {
+                // Ignore if index doesn't exist
+            }
+            
+            $pdo->exec("ALTER TABLE categories ADD UNIQUE KEY unique_category_name_per_brand (name, brand_id)");
+            
+            echo "Added brand_id column to categories table.\n";
+        }
+    } catch (PDOException $e) {
+        echo "Error updating categories table: " . $e->getMessage();
+    }
+}
+
 // Create tables if they don't exist
 ensureBrandsTableExists($pdo);
 ensureCategoriesTableExists($pdo);
@@ -237,3 +266,6 @@ updateProductsTableWithVehicleFields($pdo);
 
 // Update orders table with GST field
 updateOrdersTableWithGSTField($pdo);
+
+// Update categories table with brand_id field
+updateCategoriesTableWithBrandField($pdo);

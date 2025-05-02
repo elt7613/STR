@@ -80,3 +80,14 @@ sending limits go to
 [2025-05-02 15:56:37] About to call sendEmail function
 [2025-05-02 15:56:41] Email function returned: Email sent successfully!
 [2025-05-02 15:56:41] Email sent successfully
+[2025-05-02 18:23:58] Script started - Product Request
+[2025-05-02 18:23:58] Sending email for product request - Product ID: 8, User ID: 2
+[2025-05-02 18:23:58] About to call sendEmail function
+[2025-05-02 18:24:03] Email function returned: Email sent successfully!
+[2025-05-02 18:24:03] Email sent successfully
+[2025-05-02 18:28:08] Script started - Product Request
+[2025-05-02 18:28:08] Retrieved 2 categories for product: 8
+[2025-05-02 18:28:08] Sending email for product request - Product ID: 8, User ID: 2
+[2025-05-02 18:28:08] About to call sendEmail function
+[2025-05-02 18:28:12] Email function returned: Email sent successfully!
+[2025-05-02 18:28:12] Email sent successfully

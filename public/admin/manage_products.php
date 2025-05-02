@@ -25,7 +25,10 @@ $makes = getAllVehicleMakes();
 $models = [];
 $series = [];
 
-// Get all categories for dropdown
+// Get all brands for dropdown
+$brands = getAllBrands();
+
+// Get all categories for initial dropdown (will be filtered via AJAX)
 $categories = getAllCategories();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -324,6 +327,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             exit;
         }
     }
+}
+
+// AJAX: Get categories for specific brand
+if (isset($_GET['action']) && $_GET['action'] === 'get_brand_categories') {
+    header('Content-Type: application/json');
+    $brandId = isset($_GET['brand_id']) ? intval($_GET['brand_id']) : 0;
+    
+    if ($brandId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid brand ID']);
+        exit;
+    }
+    
+    $categories = getCategoriesByBrandId($brandId);
+    echo json_encode(['success' => true, 'categories' => $categories]);
+    exit;
 }
 
 // Get all brands and products for display

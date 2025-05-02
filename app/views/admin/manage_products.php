@@ -1399,5 +1399,63 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Brand change handler for Add Product form
+    const brandSelect = document.getElementById('brandId');
+    const categorySelect = document.getElementById('categories');
+    
+    if (brandSelect && categorySelect) {
+        brandSelect.addEventListener('change', function() {
+            fetchCategoriesForBrand(this.value, categorySelect);
+        });
+    }
+    
+    // Edit product form brand select
+    const editBrandSelect = document.getElementById('edit_brandId');
+    const editCategorySelect = document.getElementById('edit_categories');
+    
+    if (editBrandSelect && editCategorySelect) {
+        editBrandSelect.addEventListener('change', function() {
+            fetchCategoriesForBrand(this.value, editCategorySelect);
+        });
+    }
+    
+    // Function to fetch categories for a brand
+    function fetchCategoriesForBrand(brandId, categorySelectElement) {
+        if (!brandId) return;
+        
+        // Show loading state
+        categorySelectElement.disabled = true;
+        categorySelectElement.innerHTML = '<option value="">Loading categories...</option>';
+        
+        fetch(`../admin/manage_products.php?action=get_brand_categories&brand_id=${brandId}`)
+            .then(response => response.json())
+            .then(data => {
+                categorySelectElement.innerHTML = '';
+                
+                if (data.success && data.categories && data.categories.length > 0) {
+                    data.categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        categorySelectElement.appendChild(option);
+                    });
+                } else {
+                    categorySelectElement.innerHTML = '<option value="">No categories found</option>';
+                }
+                
+                categorySelectElement.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error fetching categories:', error);
+                categorySelectElement.innerHTML = '<option value="">Error loading categories</option>';
+                categorySelectElement.disabled = false;
+            });
+    }
+    
+    // Trigger the change event on page load if brand is already selected
+    if (brandSelect && brandSelect.value) {
+        brandSelect.dispatchEvent(new Event('change'));
+    }
 });
 </script> 

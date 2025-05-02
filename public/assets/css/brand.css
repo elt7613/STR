@@ -986,4 +986,13 @@
     color: #495057;
     margin: 0;
     font-size: 0.95rem;
+}
+
+/* Add styles for filter hint */
+.filter-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+    font-style: italic;
 } 

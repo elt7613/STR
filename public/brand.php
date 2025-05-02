@@ -31,8 +31,8 @@ $makes = getAllVehicleMakes();
 $models = [];
 $series = [];
 
-// Get all categories for the filter dropdown
-$categories = getAllCategories();
+// Get categories for the brand (instead of all categories)
+$categories = getCategoriesByBrandId($brandId);
 
 // Get filter parameters from URL
 $makeId = isset($_GET['make_id']) ? intval($_GET['make_id']) : 0;

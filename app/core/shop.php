@@ -572,9 +572,10 @@ function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = n
 /**
  * Get all categories
  * 
+ * @param int|null $brandId Optional brand ID to filter categories
  * @return array List of all categories
  */
-function getAllCategories() {
+function getAllCategories($brandId = null) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -583,7 +584,42 @@ function getAllCategories() {
     }
     
     try {
-        $stmt = $pdo->query("SELECT * FROM categories ORDER BY name");
+        if ($brandId) {
+            // Get categories for specific brand
+            $stmt = $pdo->prepare("SELECT * FROM categories WHERE brand_id = ? ORDER BY name");
+            $stmt->execute([$brandId]);
+        } else {
+            // Get all categories with brand info
+            $stmt = $pdo->query("
+                SELECT c.*, b.name as brand_name 
+                FROM categories c
+                JOIN brands b ON c.brand_id = b.id
+                ORDER BY b.name, c.name
+            ");
+        }
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Get categories by brand ID
+ * 
+ * @param int $brandId Brand ID
+ * @return array List of categories for the brand
+ */
+function getCategoriesByBrandId($brandId) {
+    /** @var \PDO $pdo */
+    global $pdo;
+    
+    if (!$pdo || !$brandId) {
+        return [];
+    }
+    
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM categories WHERE brand_id = ? ORDER BY name");
+        $stmt->execute([$brandId]);
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];
@@ -605,7 +641,12 @@ function getCategoryById($categoryId) {
     }
     
     try {
-        $stmt = $pdo->prepare("SELECT * FROM categories WHERE id = ?");
+        $stmt = $pdo->prepare("
+            SELECT c.*, b.name as brand_name 
+            FROM categories c
+            JOIN brands b ON c.brand_id = b.id
+            WHERE c.id = ?
+        ");
         $stmt->execute([$categoryId]);
         return $stmt->fetch();
     } catch (PDOException $e) {
@@ -617,10 +658,11 @@ function getCategoryById($categoryId) {
  * Add new category
  * 
  * @param string $name Category name
+ * @param int $brandId Brand ID
  * @param string $description Category description (optional)
  * @return array Result with status and message
  */
-function addCategory($name, $description = '') {
+function addCategory($name, $brandId, $description = '') {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -629,22 +671,26 @@ function addCategory($name, $description = '') {
         return ['success' => false, 'message' => 'Category name is required'];
     }
     
+    if (empty($brandId)) {
+        return ['success' => false, 'message' => 'Brand is required'];
+    }
+    
     if (!$pdo) {
         return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
-        // Check if category already exists
-        $stmt = $pdo->prepare("SELECT * FROM categories WHERE name = ?");
-        $stmt->execute([$name]);
+        // Check if category already exists for this brand
+        $stmt = $pdo->prepare("SELECT * FROM categories WHERE name = ? AND brand_id = ?");
+        $stmt->execute([$name, $brandId]);
         
         if ($stmt->rowCount() > 0) {
-            return ['success' => false, 'message' => 'Category already exists'];
+            return ['success' => false, 'message' => 'Category already exists for this brand'];
         }
         
         // Insert new category
-        $stmt = $pdo->prepare("INSERT INTO categories (name, description) VALUES (?, ?)");
-        $stmt->execute([$name, $description]);
+        $stmt = $pdo->prepare("INSERT INTO categories (name, brand_id, description) VALUES (?, ?, ?)");
+        $stmt->execute([$name, $brandId, $description]);
         
         return ['success' => true, 'message' => 'Category added successfully', 'id' => $pdo->lastInsertId()];
     } catch (PDOException $e) {
@@ -657,10 +703,11 @@ function addCategory($name, $description = '') {
  * 
  * @param int $categoryId Category ID
  * @param string $name Category name
+ * @param int $brandId Brand ID
  * @param string $description Category description (optional)
  * @return array Result with status and message
  */
-function updateCategory($categoryId, $name, $description = '') {
+function updateCategory($categoryId, $name, $brandId, $description = '') {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -669,13 +716,25 @@ function updateCategory($categoryId, $name, $description = '') {
         return ['success' => false, 'message' => 'Category ID and name are required'];
     }
     
+    if (empty($brandId)) {
+        return ['success' => false, 'message' => 'Brand is required'];
+    }
+    
     if (!$pdo) {
         return ['success' => false, 'message' => 'Database connection error'];
     }
     
     try {
-        $stmt = $pdo->prepare("UPDATE categories SET name = ?, description = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $categoryId]);
+        // Check if category with same name already exists for this brand (excluding current category)
+        $stmt = $pdo->prepare("SELECT * FROM categories WHERE name = ? AND brand_id = ? AND id != ?");
+        $stmt->execute([$name, $brandId, $categoryId]);
+        
+        if ($stmt->rowCount() > 0) {
+            return ['success' => false, 'message' => 'Another category with this name already exists for this brand'];
+        }
+        
+        $stmt = $pdo->prepare("UPDATE categories SET name = ?, brand_id = ?, description = ? WHERE id = ?");
+        $stmt->execute([$name, $brandId, $description, $categoryId]);
         
         return ['success' => true, 'message' => 'Category updated successfully'];
     } catch (PDOException $e) {

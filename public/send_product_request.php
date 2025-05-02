@@ -81,6 +81,10 @@ if (!$product) {
     sendJsonResponse(false, 'Product not found');
 }
 
+// Get product categories
+$categories = getProductCategories($productId);
+logDebug("Retrieved " . count($categories) . " categories for product: $productId");
+
 // Get user details
 $userId = $_SESSION['user_id'];
 $user = getUserById($userId);
@@ -101,6 +105,16 @@ $htmlBody = "
     <li><strong>Product:</strong> " . htmlspecialchars($product['title']) . "</li>
     <li><strong>Price:</strong> $" . number_format($product['amount'], 2) . "</li>
     <li><strong>Brand:</strong> " . htmlspecialchars($product['brand_name']) . "</li>";
+
+// Add categories information
+if (!empty($categories)) {
+    $htmlBody .= "
+    <li><strong>Categories:</strong> ";
+    $categoryNames = array_map(function($cat) {
+        return htmlspecialchars($cat['name']);
+    }, $categories);
+    $htmlBody .= implode(', ', $categoryNames) . "</li>";
+}
 
 // Add vehicle compatibility information if available
 if (!empty($product['make_name']) || !empty($product['model_name']) || !empty($product['series_name'])) {
@@ -150,6 +164,15 @@ Product Details:
 - Product: " . $product['title'] . "
 - Price: $" . number_format($product['amount'], 2) . "
 - Brand: " . $product['brand_name'];
+
+// Add categories to plain text version
+if (!empty($categories)) {
+    $categoryNames = array_map(function($cat) {
+        return $cat['name'];
+    }, $categories);
+    $plainTextBody .= "
+- Categories: " . implode(', ', $categoryNames);
+}
 
 // Add vehicle compatibility information to plain text version
 if (!empty($product['make_name']) || !empty($product['model_name']) || !empty($product['series_name'])) {

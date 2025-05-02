@@ -24,6 +24,36 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <?php endif; ?>
 
 <div class="row mt-4 px-3">
+    <!-- Brand Filter -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                Filter Categories by Brand
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label for="filter-brand" class="form-label">Select Brand</label>
+                        <select id="filter-brand" name="brand_id" class="form-select">
+                            <option value="0">All Brands</option>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?php echo $brand['id']; ?>" <?php echo $filterBrandId == $brand['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($brand['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <?php if ($filterBrandId > 0): ?>
+                            <a href="../admin/manage_categories.php" class="btn btn-outline-secondary">Clear Filter</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -38,7 +68,20 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <?php endif; ?>
                     
                     <div class="mb-3">
-                        <label for="name" class="form-label">Category Name</label>
+                        <label for="brand_id" class="form-label">Brand *</label>
+                        <select class="form-select" id="brand_id" name="brand_id" required>
+                            <option value="">-- Select Brand --</option>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?php echo $brand['id']; ?>" <?php echo ($currentCategory && $currentCategory['brand_id'] == $brand['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($brand['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small class="form-text text-muted">Select the brand this category belongs to</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Category Name *</label>
                         <input type="text" class="form-control" id="name" name="name" value="<?php echo $currentCategory ? htmlspecialchars($currentCategory['name']) : ''; ?>" required>
                     </div>
                     
@@ -60,7 +103,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
-                Categories List
+                Categories List <?php echo $filterBrandId > 0 ? 'for ' . htmlspecialchars(getBrandById($filterBrandId)['name']) : ''; ?>
             </div>
             <div class="card-body">
                 <?php if (empty($categories)): ?>
@@ -72,6 +115,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
+                                <th>Brand</th>
                                 <th>Description</th>
                                 <th>Date Created</th>
                                 <th>Actions</th>
@@ -82,6 +126,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             <tr>
                                 <td><?php echo $category['id']; ?></td>
                                 <td><?php echo htmlspecialchars($category['name']); ?></td>
+                                <td><?php echo htmlspecialchars($category['brand_name'] ?? 'Unknown'); ?></td>
                                 <td><?php echo htmlspecialchars($category['description'] ?? ''); ?></td>
                                 <td><?php echo date('Y-m-d H:i', strtotime($category['created_at'])); ?></td>
                                 <td>
