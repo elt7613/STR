@@ -45,7 +45,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             
             <div class="info-item">
                 <span class="info-label">Total:</span>
-                <span class="info-value">$<?php echo number_format($order['total'], 2); ?></span>
+                <span class="info-value">₹<?php echo number_format($order['total'], 2); ?></span>
             </div>
             
             <div class="info-item">
@@ -83,23 +83,28 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <?php foreach ($orderItems as $item): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($item['title']); ?> × <?php echo $item['quantity']; ?></td>
-                            <td>$<?php echo number_format($item['subtotal'], 2); ?></td>
+                            <td>₹<?php echo number_format($item['subtotal'], 2); ?></td>
                         </tr>
                     <?php endforeach; ?>
                     
                     <tr class="subtotal-row">
                         <td>Subtotal:</td>
-                        <td>$<?php echo number_format($order['subtotal'], 2); ?></td>
+                        <td>₹<?php echo number_format($order['subtotal'], 2); ?></td>
                     </tr>
                     
                     <tr class="shipping-row">
                         <td>Shipping:</td>
-                        <td>$<?php echo number_format($order['shipping_cost'], 2); ?></td>
+                        <td>₹<?php echo number_format($order['shipping_cost'], 2); ?></td>
+                    </tr>
+                    
+                    <tr class="shipping-row">
+                        <td>GST (18%):</td>
+                        <td>₹<?php echo number_format($order['gst_amount'], 2); ?></td>
                     </tr>
                     
                     <tr class="total-row">
                         <td>Total:</td>
-                        <td>$<?php echo number_format($order['total'], 2); ?></td>
+                        <td>₹<?php echo number_format($order['total'], 2); ?></td>
                     </tr>
                 </tbody>
             </table>

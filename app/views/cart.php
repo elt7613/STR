@@ -48,7 +48,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                             </a>
                             <span class="product-name"><?php echo htmlspecialchars($item['title']); ?></span>
                         </div>
-                        <div class="product-price">$<?php echo number_format($item['amount'], 2); ?></div>
+                        <div class="product-price">₹<?php echo number_format($item['amount'], 2); ?></div>
                         <div class="quantity-control">
                             <input type="number" 
                                   value="<?php echo $item['quantity']; ?>" 
@@ -61,7 +61,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                 <button class="quantity-button decrement" data-item-id="<?php echo $item['id']; ?>">▼</button>
                             </div>
                         </div>
-                        <div class="product-subtotal">$<?php echo number_format($item['amount'] * $item['quantity'], 2); ?></div>
+                        <div class="product-subtotal">₹<?php echo number_format($item['amount'] * $item['quantity'], 2); ?></div>
                         <div>
                             <button class="remove-item" data-item-id="<?php echo $item['id']; ?>">✕</button>
                         </div>
@@ -84,7 +84,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div class="totals-content">
                 <div class="subtotal-row">
                     <span>Subtotal</span>
-                    <span id="cart-subtotal">$<?php echo number_format($cartSubtotal, 2); ?></span>
+                    <span id="cart-subtotal">₹<?php echo number_format($cartSubtotal, 2); ?></span>
                 </div>
                 <div class="subtotal-row">
                     <span>Shipping</span>
@@ -92,7 +92,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 </div>
                 <div class="total-row">
                     <span>Total</span>
-                    <span id="cart-total" class="bold">$<?php echo number_format($cartSubtotal, 2); ?></span>
+                    <span id="cart-total" class="bold">₹<?php echo number_format($cartSubtotal, 2); ?></span>
                 </div>
             </div>
             <button class="checkout-button" onclick="window.location.href='checkout.php'">PROCEED TO CHECKOUT</button>

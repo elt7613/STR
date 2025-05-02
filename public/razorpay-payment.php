@@ -102,25 +102,40 @@ if (isset($_POST['razorpay_payment_id']) && isset($_POST['razorpay_order_id']) &
 // Create Razorpay order if not already created
 if (!isset($_SESSION['razorpay_order_id_' . $orderId])) {
     // Create a Razorpay order
-    $razorpayOrder = createRazorpayOrder(
-        $order['order_number'],
-        $order['total'],
-        [
-            'order_id' => $orderId,
-            'customer_name' => $billingDetails['first_name'] . ' ' . $billingDetails['last_name'],
-            'customer_email' => $billingDetails['email'],
-            'customer_phone' => $billingDetails['phone']
-        ]
-    );
-    
-    if (!$razorpayOrder) {
-        $_SESSION['error'] = 'Failed to create payment order. Please try again.';
-        header('Location: checkout.php');
-        exit;
+    try {
+        // Sleep for a second to avoid rate limiting
+        usleep(500000); // 500ms delay
+        
+        $razorpayOrder = createRazorpayOrder(
+            $order['order_number'],
+            $order['total'],
+            [
+                'order_id' => $orderId,
+                'customer_name' => $billingDetails['first_name'] . ' ' . $billingDetails['last_name'],
+                'customer_email' => $billingDetails['email'],
+                'customer_phone' => $billingDetails['phone']
+            ]
+        );
+        
+        if (!$razorpayOrder) {
+            throw new Exception('Failed to create Razorpay order - API returned null');
+        }
+        
+        // Store Razorpay order ID in session
+        $_SESSION['razorpay_order_id_' . $orderId] = $razorpayOrder['id'];
+        
+    } catch (Exception $e) {
+        // Display error and log it
+        echo '<div style="color:red; padding:20px; margin:20px; border:1px solid red;">';
+        echo 'Error creating Razorpay order: ' . $e->getMessage() . '<br>';
+        echo 'Debug info: orderID=' . $orderId . ', amount=' . $order['total'] . '<br>';
+        echo 'Please try again or contact support.';
+        echo '</div>';
+        
+        // Log error
+        error_log('Razorpay Error: ' . $e->getMessage());
+        $_SESSION['error'] = 'Failed to create payment order: ' . $e->getMessage();
     }
-    
-    // Store Razorpay order ID in session
-    $_SESSION['razorpay_order_id_' . $orderId] = $razorpayOrder['id'];
 } else {
     // Get existing Razorpay order ID from session
     $razorpayOrderId = $_SESSION['razorpay_order_id_' . $orderId];
@@ -167,14 +182,14 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         <div class="order-details">
             <div class="order-info">
                 <p><strong>Order Number:</strong> <?php echo htmlspecialchars($order['order_number']); ?></p>
-                <p><strong>Total Amount:</strong> $<?php echo number_format($order['total'], 2); ?></p>
+                <p><strong>Total Amount:</strong> ₹<?php echo number_format($order['total'], 2); ?></p>
             </div>
             
             <div class="order-items">
                 <?php foreach ($orderItems as $item): ?>
                     <div class="order-item">
                         <span class="item-name"><?php echo htmlspecialchars($item['title']); ?> × <?php echo $item['quantity']; ?></span>
-                        <span class="item-price">$<?php echo number_format($item['subtotal'], 2); ?></span>
+                        <span class="item-price">₹<?php echo number_format($item['subtotal'], 2); ?></span>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -188,7 +203,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div id="razorpay-button-container">
                 <button id="razorpay-payment-button" class="payment-button">
                     <img src="assets/img/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
-                    Pay $<?php echo number_format($order['total'], 2); ?>
+                    Pay ₹<?php echo number_format($order['total'], 2); ?>
                 </button>
             </div>
             
@@ -248,14 +263,18 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Log key information
+    console.log('Razorpay payment setup initializing');
+    console.log('Order amount:', <?php echo $order['total']; ?>);
+    
     const options = {
         key: '<?php echo RAZORPAY_KEY_ID; ?>',
-        amount: <?php echo $order['total'] * 100; ?>,
+        amount: <?php echo round($order['total'] * 100); ?>,
         currency: 'INR',
         name: 'STR Works',
         description: 'Order #<?php echo $order['order_number']; ?>',
-        order_id: '<?php echo $razorpayOrder['id']; ?>',
-        image: 'assets/img/STR-logo.webp',
+        order_id: '<?php echo isset($razorpayOrder['id']) ? $razorpayOrder['id'] : ''; ?>',
+        image: '<?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]"; ?>/assets/img/STR-logo.webp',
         prefill: {
             name: '<?php echo htmlspecialchars($billingDetails['first_name'] . ' ' . $billingDetails['last_name']); ?>',
             email: '<?php echo htmlspecialchars($billingDetails['email']); ?>',
@@ -297,16 +316,45 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.body.appendChild(form);
             form.submit();
+        },
+        modal: {
+            ondismiss: function() {
+                console.log('Payment modal dismissed');
+            },
+            escape: true,
+            backdropclose: false
         }
     };
     
     const rzp = new Razorpay(options);
     
+    // Error handling for Razorpay
+    rzp.on('payment.failed', function(response) {
+        console.error('Payment failed:', response.error);
+        alert('Payment failed: ' + response.error.description);
+    });
+    
+    // Auto-open Razorpay checkout if debug parameter is provided
+    <?php if (isset($_GET['auto_open']) && $_GET['auto_open'] === '1'): ?>
+    setTimeout(function() {
+        try {
+            rzp.open();
+        } catch (e) {
+            console.error('Error opening Razorpay:', e);
+            alert('Error opening payment form: ' + e.message);
+        }
+    }, 1000);
+    <?php endif; ?>
+    
     document.getElementById('razorpay-payment-button').onclick = function(e) {
-        rzp.open();
+        console.log('Payment button clicked, opening Razorpay');
+        try {
+            rzp.open();
+        } catch (e) {
+            console.error('Error opening Razorpay:', e);
+            alert('Error opening payment form: ' + e.message);
+        }
         e.preventDefault();
     };
 });
 </script>
-
-<?php require_once ROOT_PATH . '/app/views/partials/footer.php'; ?> 

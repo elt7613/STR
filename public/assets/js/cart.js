@@ -125,7 +125,7 @@ function updateCartItems(items) {
             <img src="${imageUrl}" alt="${item.title}" class="w-20 h-20 object-cover" />
             <div>
                 <h4 class="text-sm">${item.title}</h4>
-                <p class="text-sm text-white">$${parseFloat(item.amount).toFixed(2)}</p>
+                <p class="text-sm text-white">₹${parseFloat(item.amount).toFixed(2)}</p>
                 <span class="text-sm">Qty: ${item.quantity}</span>
             </div>
             <button onclick="removeFromCart(${item.id})" class="text-gray-500 hover:text-red-600 remove-item">

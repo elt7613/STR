@@ -224,7 +224,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                 </div>
                                 <div class="product-info">
                                     <h5 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h5>
-                                    <div class="product-price">$<?php echo number_format($product['amount'], 2); ?></div>
+                                    <div class="product-price">₹<?php echo number_format($product['amount'], 2); ?></div>
                                 </div>
                             </a>
                         </div>

@@ -62,3 +62,9 @@ require_once __DIR__ . '/partials/header.php';
         </form>
     </div>
 </div>
+
+
+<?php 
+// Include header
+require_once __DIR__ . '/partials/footer.php'; 
+?>

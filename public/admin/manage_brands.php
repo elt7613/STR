@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && ($_POST['action'] === 'add' || $_POST['action'] === 'update')) {
         $name = $_POST['name'] ?? '';
         $brandId = isset($_POST['brand_id']) ? intval($_POST['brand_id']) : 0;
+        $sequence = isset($_POST['sequence']) ? intval($_POST['sequence']) : 999;
         
         // Check if an image was uploaded
         $image = '';
@@ -56,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else if (empty($image) && !$imageUploaded) {
                 $error = 'Brand image is required.';
             } else {
-                $result = addBrand($name, $image);
+                $result = addBrand($name, $image, $sequence);
                 if ($result['success']) {
                     $success = $result['message'];
                 } else {
@@ -69,9 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Brand name and ID are required.';
             } else {
                 if ($imageUploaded) {
-                    $result = updateBrand($brandId, $name, $image);
+                    $result = updateBrand($brandId, $name, $image, $sequence);
                 } else {
-                    $result = updateBrand($brandId, $name);
+                    $result = updateBrand($brandId, $name, null, $sequence);
                 }
                 
                 if ($result['success']) {

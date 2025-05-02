@@ -48,7 +48,7 @@ $headerBrands = getAllBrands();
     <script src="assets/js/header.js" defer></script>
     <script src="assets/js/cart.js" defer></script>
 </head>
-<body>
+<body style="background: #fff;">
     <!-- Navigation Bar -->
     <header class="header">
         <div class="container header-container">
@@ -153,7 +153,7 @@ $headerBrands = getAllBrands();
             <button class="mt-4 w-3/5 font-semi-bold bg-pink-500 text-white py-2 text-sm view-cart-btn" onclick="window.location.href='cart.php'">
                 VIEW CART
             </button>
-            <button class="mt-4 w-3/5 font-semi-bold bg-black text-white py-2 text-sm bold border-white border-2 hover:border-pink-500 hover:text-pink-500 transition checkout-btn">
+            <button class="mt-4 w-3/5 font-semi-bold bg-black text-white py-2 text-sm bold border-white border-2 hover:border-pink-500 hover:text-pink-500 transition checkout-btn" onclick="window.location.href='cart.php'">
                 CHECKOUT
             </button>
         </div>

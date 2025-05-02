@@ -65,3 +65,18 @@ sending limits go to
 [2025-04-30 16:11:42] About to call sendEmail function
 [2025-04-30 16:11:46] Email function returned: Email sent successfully!
 [2025-04-30 16:11:46] Email sent successfully
+[2025-05-02 15:04:34] Script started - Product Request
+[2025-05-02 15:04:34] Sending email for product request - Product ID: 3, User ID: 10
+[2025-05-02 15:04:34] About to call sendEmail function
+[2025-05-02 15:04:39] Email function returned: Email sent successfully!
+[2025-05-02 15:04:39] Email sent successfully
+[2025-05-02 15:07:27] Script started - Product Request
+[2025-05-02 15:07:27] Sending email for product request - Product ID: 8, User ID: 5
+[2025-05-02 15:07:27] About to call sendEmail function
+[2025-05-02 15:07:32] Email function returned: Email sent successfully!
+[2025-05-02 15:07:32] Email sent successfully
+[2025-05-02 15:56:36] Script started - Product Request
+[2025-05-02 15:56:37] Sending email for product request - Product ID: 6, User ID: 2
+[2025-05-02 15:56:37] About to call sendEmail function
+[2025-05-02 15:56:41] Email function returned: Email sent successfully!
+[2025-05-02 15:56:41] Email sent successfully

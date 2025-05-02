@@ -54,7 +54,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             </div>
             <?php endif; ?>
             
-            <p class="product-price">$<?php echo number_format($product['amount'], 2); ?></p>
+            <p class="product-price">₹<?php echo number_format($product['amount'], 2); ?></p>
             
             <div class="product-description">
                 <?php echo nl2br(htmlspecialchars($product['description'])); ?>
@@ -130,7 +130,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                         </div>
                         <div class="product-info">
                             <h5 class="product-title"><?php echo htmlspecialchars($relatedProduct['title']); ?></h5>
-                            <div class="product-price">$<?php echo number_format($relatedProduct['amount'], 2); ?></div>
+                            <div class="product-price">₹<?php echo number_format($relatedProduct['amount'], 2); ?></div>
                         </div>
                     </a>
                 </div>

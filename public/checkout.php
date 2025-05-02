@@ -30,8 +30,11 @@ foreach ($cartItems as $item) {
     $cartSubtotal += $item['amount'] * $item['quantity'];
 }
 
-// Calculate total
-$cartTotal = $cartSubtotal + $shippingCost;
+// Calculate GST (18%)
+$gstAmount = $cartSubtotal * 0.18;
+
+// Calculate total with GST
+$cartTotal = $cartSubtotal + $shippingCost + $gstAmount;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -70,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $cartSubtotal,
                 $shippingCost,
                 $cartTotal,
-                $orderNotes
+                $orderNotes,
+                $gstAmount // Pass GST amount to createOrder
             );
             
             if ($orderResult['success']) {
@@ -142,8 +146,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Store order ID in session for the payment process
                         $_SESSION['pending_order_id'] = $orderId;
                         
-                        // Redirect to Razorpay payment page
-                        header('Location: razorpay-payment.php?order_id=' . $orderId);
+                        // Debug message - will be removed in production
+                        error_log("Redirecting to Razorpay payment page with order_id: " . $orderId);
+                        
+                        // Redirect to Razorpay payment page with auto_open parameter
+                        header('Location: razorpay-payment.php?order_id=' . $orderId . '&auto_open=1');
                         exit;
                     } else {
                         $error = 'Invalid payment method';

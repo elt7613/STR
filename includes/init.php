@@ -3,6 +3,10 @@
  * Application initialization script
  */
 
+// Enable error reporting for debugging (should be turned off in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     // Set session cookie parameters for better security
@@ -27,7 +31,12 @@ if (session_status() === PHP_SESSION_NONE) {
 // Ensure we have a session ID
 if (empty(session_id())) {
     error_log("WARNING: Empty session ID after session start in init.php");
+    // Try to restart the session
+    session_start();
 }
+
+// Write session ID to error log for debugging
+error_log("Session ID: " . session_id());
 
 // Set default timezone to Indian Standard Time (IST)
 date_default_timezone_set('Asia/Kolkata');

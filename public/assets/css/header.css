@@ -50,12 +50,12 @@
 
 /* Enhanced hover effect */
 .nav-link:hover {
-    color: #ff6b6b; /* Brighter color for more visibility */
+    color: #fff;
     transform: translateY(-2px); /* Slight lift effect */
 }
 
 .nav-link.active {
-    color: #ff6b6b;
+    color: #fff;
     font-weight: 600;
 }
 
@@ -67,7 +67,7 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #ff6b6b;
+    background-color: #fff;
     transition: width 0.3s ease;
 }
 
@@ -321,7 +321,7 @@
 
 .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 80px;
     left: 0;
     background-color: #111;
     min-width: 220px;
@@ -349,13 +349,28 @@
     color: #fff;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 13px;
+    font-size: 15px;
+    position: relative;
 }
 
 .dropdown-item:hover {
-    background-color: #333;
-    color: #ff6b6b;
-    padding-left: 25px;
+    color: #fff;
+}
+
+/* Add underline effect for dropdown items */
+.dropdown-item::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 5px;
+    left: 20px;
+    background-color: #fff;
+    transition: width 0.3s ease;
+}
+
+.dropdown-item:hover::after {
+    width: calc(100% - 40px); /* Account for padding */
 }
 
 /* Mobile Menu Styles */
@@ -423,8 +438,17 @@
     }
     
     .dropdown-item:hover {
-        padding-left: 25px;
-        background-color: #333;
+        padding-left: 20px;
+    }
+    
+    /* Mobile underline effect adjustment */
+    .dropdown-item::after {
+        bottom: 5px;
+        left: 20px;
+    }
+    
+    .dropdown-item:hover::after {
+        width: calc(100% - 40px);
     }
     
     /* Add arrow indicator for mobile dropdowns */

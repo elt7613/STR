@@ -33,7 +33,14 @@ function createRazorpayOrder($orderNumber, $amount, $notes = []) {
         $api = getRazorpayApi();
         
         // Convert amount to paise (Razorpay expects amount in smallest currency unit)
-        $amountInPaise = $amount * 100;
+        $amountInPaise = round($amount * 100);
+        
+        // Ensure amount is at least 100 paise (₹1), as required by Razorpay
+        if ($amountInPaise < 100) {
+            $amountInPaise = 100;
+        }
+        
+        error_log("Creating Razorpay order: " . $orderNumber . ", Amount: " . $amountInPaise . " paise");
         
         $orderData = [
             'receipt'         => $orderNumber,
@@ -43,11 +50,22 @@ function createRazorpayOrder($orderNumber, $amount, $notes = []) {
             'notes'           => $notes
         ];
         
-        $razorpayOrder = $api->order->create($orderData);
-        return $razorpayOrder->toArray();
+        error_log("Razorpay order data: " . json_encode($orderData));
+        
+        // Add error handling for API connection
+        try {
+            $razorpayOrder = $api->order->create($orderData);
+            error_log("Razorpay order created: " . json_encode($razorpayOrder->toArray()));
+            return $razorpayOrder->toArray();
+        } catch (\Razorpay\Api\Errors\BadRequestError $e) {
+            // Handle specific Razorpay API errors
+            error_log('Razorpay Bad Request: ' . $e->getMessage());
+            throw new \Exception('Razorpay API Error: ' . $e->getMessage());
+        }
     } catch (\Exception $e) {
         error_log('Razorpay order creation failed: ' . $e->getMessage());
-        return null;
+        error_log('Razorpay order creation failed trace: ' . $e->getTraceAsString());
+        throw $e; // Re-throw to be handled by the caller
     }
 }
 

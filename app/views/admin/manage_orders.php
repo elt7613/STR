@@ -171,7 +171,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                         <td>
                             <div class="price-tag">
                                 <?php echo number_format($order['total'], 2); ?>
-                                <small><?php echo htmlspecialchars($order['currency'] ?? 'USD'); ?></small>
+                                <small><?php echo htmlspecialchars($order['currency'] ?? 'INR'); ?></small>
                             </div>
                         </td>
                         <td>
@@ -258,15 +258,19 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             <div class="card-body">
                 <div class="summary-item">
                     <div class="label">Subtotal:</div>
-                    <div class="value"><?php echo number_format($orderDetails['subtotal'], 2); ?> <?php echo $orderDetails['currency'] ?? 'USD'; ?></div>
+                    <div class="value"><?php echo number_format($orderDetails['subtotal'], 2); ?> <?php echo $orderDetails['currency'] ?? 'INR'; ?></div>
                 </div>
                 <div class="summary-item">
                     <div class="label">Shipping:</div>
-                    <div class="value"><?php echo number_format($orderDetails['shipping_cost'], 2); ?> <?php echo $orderDetails['currency'] ?? 'USD'; ?></div>
+                    <div class="value"><?php echo number_format($orderDetails['shipping_cost'], 2); ?> <?php echo $orderDetails['currency'] ?? 'INR'; ?></div>
+                </div>
+                <div class="summary-item">
+                    <div class="label">GST (18%):</div>
+                    <div class="value"><?php echo number_format($orderDetails['gst_amount'], 2); ?> <?php echo $orderDetails['currency'] ?? 'INR'; ?></div>
                 </div>
                 <div class="summary-item total">
                     <div class="label">Total:</div>
-                    <div class="value"><?php echo number_format($orderDetails['total'], 2); ?> <?php echo $orderDetails['currency'] ?? 'USD'; ?></div>
+                    <div class="value"><?php echo number_format($orderDetails['total'], 2); ?> <?php echo $orderDetails['currency'] ?? 'INR'; ?></div>
                 </div>
                 <div class="summary-item">
                     <div class="label">Payment Method:</div>
@@ -342,7 +346,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                         <div class="payment-details">
                             <div>
                                 <i class="fas fa-money-bill-wave"></i> 
-                                <?php echo number_format($payment['amount'], 2); ?> <?php echo isset($payment['currency']) ? htmlspecialchars($payment['currency']) : 'USD'; ?>
+                                <?php echo number_format($payment['amount'], 2); ?> <?php echo isset($payment['currency']) ? htmlspecialchars($payment['currency']) : 'INR'; ?>
                             </div>
                             <div>
                                 <i class="fas fa-clock"></i> 
@@ -428,7 +432,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <td>
                                     <div class="price-tag">
                                         <?php echo number_format($item['price'], 2); ?>
-                                        <small><?php echo $orderDetails['currency'] ?? 'USD'; ?></small>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
                                     </div>
                                 </td>
                                 <td>
@@ -437,7 +441,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <td>
                                     <div class="price-tag">
                                         <?php echo number_format($item['subtotal'], 2); ?>
-                                        <small><?php echo $orderDetails['currency'] ?? 'USD'; ?></small>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
                                     </div>
                                 </td>
                             </tr>
@@ -449,7 +453,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <td>
                                     <div class="price-tag">
                                         <?php echo number_format($orderDetails['subtotal'], 2); ?>
-                                        <small><?php echo $orderDetails['currency'] ?? 'USD'; ?></small>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
                                     </div>
                                 </td>
                             </tr>
@@ -458,7 +462,16 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <td>
                                     <div class="price-tag">
                                         <?php echo number_format($orderDetails['shipping_cost'], 2); ?>
-                                        <small><?php echo $orderDetails['currency'] ?? 'USD'; ?></small>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>GST (18%)</strong></td>
+                                <td>
+                                    <div class="price-tag">
+                                        <?php echo number_format($orderDetails['gst_amount'], 2); ?>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
                                     </div>
                                 </td>
                             </tr>
@@ -467,7 +480,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <td>
                                     <div class="price-tag total">
                                         <?php echo number_format($orderDetails['total'], 2); ?>
-                                        <small><?php echo $orderDetails['currency'] ?? 'USD'; ?></small>
+                                        <small><?php echo $orderDetails['currency'] ?? 'INR'; ?></small>
                                     </div>
                                 </td>
                             </tr>

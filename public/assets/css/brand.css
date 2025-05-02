@@ -59,7 +59,6 @@
     max-height: 100px;
     margin-bottom: 20px;
     transition: transform 0.4s ease;
-    border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.12);
     position: relative;
     z-index: 1;
@@ -99,6 +98,7 @@
     color: #333;
     position: relative;
     padding-bottom: 20px;
+    font-size: 1.5rem;
 }
 
 .section-title:after {
@@ -114,7 +114,6 @@
 
 .filter-section {
     background-color: #ffffff;
-    border-radius: 12px;
     padding: 25px;
     margin-bottom: 40px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.04);
@@ -130,7 +129,6 @@
 }
 
 .form-select {
-    border-radius: 8px;
     border-color: #e0e0e0;
     padding: 12px;
     font-size: 0.95rem;
@@ -153,7 +151,6 @@
     background: linear-gradient(90deg, #ff5bae, #fd72cc);
     border: none;
     padding: 12px 24px;
-    border-radius: 0;
     transition: all 0.3s ease;
     font-weight: 600;
 }
@@ -168,7 +165,6 @@
     border: 1px solid #ced4da;
     color: #6c757d;
     padding: 12px 24px;
-    border-radius: 0;
     transition: all 0.3s ease;
     font-weight: 500;
 }
@@ -191,6 +187,7 @@
     aspect-ratio: 1/1;
     overflow: hidden;
     background-color: #f3eef0;
+    border-radius: 0;
 }
 
 .product-card img {
@@ -200,6 +197,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 0;
     transition: transform 0.3s ease-in-out;
 }
 
@@ -245,7 +243,6 @@
 
 .badge {
     padding: 6px 12px;
-    border-radius: 50px;
     font-weight: 500;
     font-size: 0.75rem;
     margin-right: 5px;
@@ -282,7 +279,6 @@
     color: white;
     border: none;
     padding: 12px 20px;
-    border-radius: 0;
     transition: all 0.3s ease;
     width: 100%;
     font-weight: 600;
@@ -306,7 +302,6 @@
     border: none;
     width: 40px;
     height: 40px;
-    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -330,7 +325,6 @@
     background: #d2d2d2;
     color: black;
     font-weight: 600;
-    border-radius: 0;
     transition: all 0.3s ease;
     border: 2px solid #d2d2d2;
     text-decoration: none;
@@ -351,7 +345,6 @@
     color: #6c757d;
     font-size: 1.2rem;
     background-color: #f9f9f9;
-    border-radius: 12px;
     border: 2px dashed #e0e0e0;
 }
 
@@ -368,7 +361,6 @@
     line-height: 1.5;
     background-color: rgba(255, 255, 255, 0.7);
     padding: 12px 15px;
-    border-radius: 10px;
 }
 
 .brand-stats {
@@ -401,7 +393,6 @@
 .active-filters {
     background-color: #f8f9fa;
     padding: 15px 20px;
-    border-radius: 8px;
     margin-bottom: 25px;
 }
 
@@ -422,7 +413,6 @@
     align-items: center;
     background-color: #fff;
     padding: 8px 12px;
-    border-radius: 6px;
     border: 1px solid #e0e0e0;
     color: #555;
     font-size: 0.9rem;
@@ -435,7 +425,6 @@
     margin-left: 8px;
     width: 20px;
     height: 20px;
-    border-radius: 50%;
     background-color: #f0f0f0;
     color: #555;
     text-decoration: none;
@@ -599,7 +588,6 @@
     position: relative;
     overflow: hidden;
     border: none;
-    border-radius: 0;
     margin-bottom: 0;
     max-width: none;
     box-shadow: none;
@@ -672,7 +660,6 @@
     grid-column: 1 / -1;
     padding: 40px;
     background-color: #f8f9fa;
-    border-radius: 12px;
     border: 2px dashed #ff5bae;
     color: #666;
 }
@@ -680,7 +667,6 @@
 /* Modern Filter Styles */
 .filter-container {
     background-color: #ffffff;
-    border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     margin-bottom: 30px;
@@ -756,7 +742,6 @@
     appearance: none;
     width: 100%;
     padding: 10px 15px;
-    border-radius: 8px;
     border: 1px solid #e0e0e0;
     background-color: #fff;
     font-size: 0.95rem;
@@ -796,7 +781,6 @@
     color: white;
     border: none;
     padding: 12px 25px;
-    border-radius: 0;
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
@@ -817,7 +801,6 @@
     background-color: transparent;
     color: #666;
     padding: 12px 25px;
-    border-radius: 0;
     font-weight: 500;
     font-size: 0.95rem;
     cursor: pointer;
@@ -836,7 +819,6 @@
 /* Active Filters Styling */
 .active-filters {
     background-color: #f8f9fc;
-    border-radius: 12px;
     padding: 18px 25px;
     margin-bottom: 25px;
     border: 1px solid rgba(0,0,0,0.05);
@@ -861,7 +843,6 @@
     background-color: #fff;
     color: #333;
     padding: 8px 15px;
-    border-radius: 0;
     font-size: 0.85rem;
     font-weight: 500;
     display: inline-flex;
@@ -908,7 +889,6 @@
     font-weight: 600;
     text-decoration: none;
     padding: 8px 15px;
-    border-radius: 0;
     background-color: rgba(255, 91, 174, 0.08);
     transition: all 0.2s ease;
     margin-left: auto;
@@ -921,7 +901,6 @@
 
 .products-count {
     background-color: #fff;
-    border-radius: 12px;
     padding: 15px 25px;
     margin-bottom: 30px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.04);
@@ -992,7 +971,6 @@
     border-left: 4px solid #4dabf7;
     padding: 15px 20px;
     margin: 15px 0;
-    border-radius: 8px;
     display: flex;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);

@@ -9,7 +9,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 <div class="admin-header">
     <h1><i class="fas fa-tags"></i> Manage Brands</h1>
     <div class="admin-actions">
-        <a href="..../admin/dashboard.php" class="btn btn-outline-secondary">
+        <a href="dashboard.php" class="btn btn-outline-secondary"></a>
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
     </div>
@@ -67,24 +67,35 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             </div>
             
             <div class="form-group">
-                <label for="brandImage" class="form-label">Brand Image<?php echo isset($editBrand) ? '' : '*'; ?></label>
-                <div class="file-upload-container">
-                    <label for="brandImage" class="file-upload-label">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span>Choose image file...</span>
-                    </label>
-                    <input type="file" class="form-control file-upload" id="brandImage" name="image" accept="image/*" <?php echo isset($editBrand) ? '' : 'required'; ?>>
-                    <div class="file-name"></div>
+                <label for="brandSequence" class="form-label">Display Sequence</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-sort-numeric-down"></i>
+                    <input type="number" class="form-control" id="brandSequence" name="sequence" min="1" 
+                           value="<?php echo isset($editBrand) ? htmlspecialchars($editBrand['sequence']) : '999'; ?>"
+                           placeholder="Enter sequence number">
                 </div>
-                <small class="form-hint">Recommended size: 400×400px, PNG or JPG format</small>
+                <small class="form-hint">Lower numbers will appear first (1 is highest priority)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="brandImage" class="form-label">
+                    <?php echo isset($editBrand) ? 'Brand Image (Leave empty to keep current)' : 'Brand Image*'; ?>
+                </label>
+                <div class="custom-file-upload">
+                    <input type="file" id="brandImage" name="image" class="form-control" 
+                           <?php echo !isset($editBrand) ? 'required' : ''; ?>
+                           accept="image/*">
+                    <label for="brandImage">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span class="file-label">Choose a file...</span>
+                    </label>
+                </div>
+                <small class="form-hint">Recommended size: 200x100 pixels, PNG or JPG format</small>
                 
                 <?php if (isset($editBrand) && !empty($editBrand['image'])): ?>
-                    <div class="current-image-container">
-                        <div class="current-image-label">Current Image:</div>
-                        <div class="current-image-preview">
-                            <img src="../<?php echo htmlspecialchars($editBrand['image']); ?>" alt="Current image" class="brand-image-preview">
-                        </div>
-                        <small class="text-muted">Upload a new image to replace the current one, or leave blank to keep it.</small>
+                    <div class="current-image">
+                        <span>Current Image:</span>
+                        <img src="../<?php echo htmlspecialchars($editBrand['image']); ?>" alt="<?php echo htmlspecialchars($editBrand['name']); ?>" class="img-thumbnail" style="max-height: 60px;">
                     </div>
                 <?php endif; ?>
             </div>
@@ -96,7 +107,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
             </button>
             
             <?php if (isset($_GET['edit'])): ?>
-                <a href="..../admin/manage_brands.php" class="btn btn-outline-secondary">
+                <a href="manage_brands.php" class="btn btn-outline-secondary">
                     <i class="fas fa-times"></i> Cancel
                 </a>
             <?php endif; ?>
@@ -130,15 +141,16 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                 <div class="brand-card" data-brand-name="<?php echo htmlspecialchars(strtolower($brand['name'])); ?>">
                     <div class="brand-card-header">
                         <span class="brand-id">#<?php echo $brand['id']; ?></span>
+                        <span class="brand-sequence">Sequence: <?php echo $brand['sequence']; ?></span>
                         <div class="brand-actions dropdown">
                             <button class="dropdown-toggle">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <div class="dropdown-menu">
-                                <a href="..../admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="dropdown-item">
+                                <a href="manage_brands.php?edit=<?php echo $brand['id']; ?>" class="dropdown-item">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="..../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="dropdown-item">
+                                <a href="../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="dropdown-item">
                                     <i class="fas fa-eye"></i> View Frontend
                                 </a>
                                 <form action="" method="post" onsubmit="return confirm('Are you sure you want to delete this brand? This will also delete all products associated with this brand.');">
@@ -167,10 +179,10 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     </div>
                     
                     <div class="brand-card-footer">
-                        <a href="..../admin/manage_brands.php?edit=<?php echo $brand['id']; ?>" class="btn btn-sm btn-primary">
+                        <a href="manage_brands.php?edit=<?php echo $brand['id']; ?>" class="btn btn-sm btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <a href="..../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <a href="../brand.php?id=<?php echo $brand['id']; ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-eye"></i> View
                         </a>
                     </div>
@@ -368,14 +380,24 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 1rem;
-    background-color: var(--gray-100);
+    padding: 0.75rem;
+    background-color: var(--light-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .brand-id {
     font-size: 0.8rem;
     color: var(--gray-500);
     font-weight: 500;
+}
+
+.brand-sequence {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    background-color: rgba(var(--primary-rgb), 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
 }
 
 .brand-actions {

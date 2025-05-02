@@ -12,7 +12,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         <!-- Modern Filter Section -->
         <div class="filter-container mb-4">
             <div class="filter-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
-                <h3><i class="fas fa-sliders-h me-2"></i>Filter Products</h3>
+                <h3><i class="fas fa-sliders-h me-2"></i> Filter Products</h3>
                 <span class="filter-toggle"><i class="fas fa-chevron-down"></i></span>
             </div>
             
@@ -178,7 +178,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                             </div>
                             <div class="product-info">
                                 <h5 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h5>
-                                <div class="product-price">$<?php echo number_format($product['amount'], 2); ?></div>
+                                <div class="product-price">₹<?php echo number_format($product['amount'], 2); ?></div>
                             </div>
                         </a>
                     </div>
@@ -187,10 +187,10 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 <div class="no-products">
                     <p>No products available for this brand with the selected filters.</p>
                     <?php if (isset($vehicleFilterApplied) && $vehicleFilterApplied): ?>
-                        <div class="notification-alert">
+                        <!-- <div class="notification-alert">
                             <i class="fas fa-bell"></i>
                             <p>We've notified our team about your search. We'll consider adding products for this vehicle in the future!</p>
-                        </div>
+                        </div> -->
                     <?php endif; ?>
                     <a href="brand.php?id=<?php echo $brandId; ?>" class="btn btn-outline-primary mt-3">Clear Filters</a>
                 </div>

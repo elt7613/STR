@@ -18,7 +18,7 @@ function getAllBrands() {
     if (!$pdo) return [];
     
     try {
-        $stmt = $pdo->query("SELECT * FROM brands ORDER BY name");
+        $stmt = $pdo->query("SELECT * FROM brands ORDER BY sequence ASC, name ASC");
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];
@@ -51,9 +51,10 @@ function getBrandById($brandId) {
  * 
  * @param string $name Brand name
  * @param string $image Brand image path
+ * @param int $sequence Display sequence (lower values shown first)
  * @return array Result with status and message
  */
-function addBrand($name, $image) {
+function addBrand($name, $image, $sequence = 999) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -76,8 +77,8 @@ function addBrand($name, $image) {
         }
         
         // Insert new brand
-        $stmt = $pdo->prepare("INSERT INTO brands (name, image) VALUES (?, ?)");
-        $stmt->execute([$name, $image]);
+        $stmt = $pdo->prepare("INSERT INTO brands (name, image, sequence) VALUES (?, ?, ?)");
+        $stmt->execute([$name, $image, $sequence]);
         
         return ['success' => true, 'message' => 'Brand added successfully', 'id' => $pdo->lastInsertId()];
     } catch (PDOException $e) {
@@ -91,9 +92,10 @@ function addBrand($name, $image) {
  * @param int $brandId Brand ID
  * @param string $name Brand name
  * @param string $image Brand image path
+ * @param int|null $sequence Display sequence (lower values shown first)
  * @return array Result with status and message
  */
-function updateBrand($brandId, $name, $image = null) {
+function updateBrand($brandId, $name, $image = null, $sequence = null) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -107,12 +109,23 @@ function updateBrand($brandId, $name, $image = null) {
     }
     
     try {
-        // If image is provided, update both name and image
-        if ($image) {
+        // If image and sequence are provided
+        if ($image && $sequence !== null) {
+            $stmt = $pdo->prepare("UPDATE brands SET name = ?, image = ?, sequence = ? WHERE id = ?");
+            $stmt->execute([$name, $image, $sequence, $brandId]);
+        }
+        // If only image is provided
+        else if ($image) {
             $stmt = $pdo->prepare("UPDATE brands SET name = ?, image = ? WHERE id = ?");
             $stmt->execute([$name, $image, $brandId]);
-        } else {
-            // Otherwise, update only name
+        }
+        // If only sequence is provided
+        else if ($sequence !== null) {
+            $stmt = $pdo->prepare("UPDATE brands SET name = ?, sequence = ? WHERE id = ?");
+            $stmt->execute([$name, $sequence, $brandId]);
+        }
+        // Otherwise, update only name
+        else {
             $stmt = $pdo->prepare("UPDATE brands SET name = ? WHERE id = ?");
             $stmt->execute([$name, $brandId]);
         }
@@ -1157,9 +1170,10 @@ function getCartItemCount() {
  * @param float $shippingCost Shipping cost
  * @param float $total Order total
  * @param string $notes Order notes
+ * @param float $gstAmount GST amount
  * @return array Array with success status and order ID or error message
  */
-function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCost, $total, $notes = '') {
+function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCost, $total, $notes = '', $gstAmount = 0) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -1181,10 +1195,10 @@ function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCo
         $stmt = $pdo->prepare("
             INSERT INTO orders (
                 order_number, user_id, session_id, payment_method, 
-                subtotal, shipping_cost, total, notes
+                subtotal, shipping_cost, gst_amount, total, notes
             ) VALUES (
                 :order_number, :user_id, :session_id, :payment_method, 
-                :subtotal, :shipping_cost, :total, :notes
+                :subtotal, :shipping_cost, :gst_amount, :total, :notes
             )
         ");
         
@@ -1195,6 +1209,7 @@ function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCo
             ':payment_method' => $paymentMethod,
             ':subtotal' => $subtotal,
             ':shipping_cost' => $shippingCost,
+            ':gst_amount' => $gstAmount,
             ':total' => $total,
             ':notes' => $notes
         ]);
@@ -1745,7 +1760,7 @@ function updateOrderStatus($orderId, $status) {
                             ':transaction_id' => $transactionId,
                             ':payment_method' => 'Cash on Delivery',
                             ':amount' => $orderInfo['total'],
-                            ':currency' => $orderInfo['currency'] ?? 'USD',
+                            ':currency' => $orderInfo['currency'] ?? 'INR',
                             ':status' => 'completed',
                             ':gateway_response' => json_encode(['message' => 'Payment received on delivery'])
                         ]);

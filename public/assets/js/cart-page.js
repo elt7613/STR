@@ -117,14 +117,14 @@ function updateItemSubtotal(itemId, quantity) {
         const subtotalEl = item.querySelector('.product-subtotal');
         
         if (priceEl && subtotalEl) {
-            // Extract the price (remove $ and convert to number)
-            const price = parseFloat(priceEl.textContent.replace('$', ''));
+            // Extract the price (remove ₹ and convert to number)
+            const price = parseFloat(priceEl.textContent.replace('₹', ''));
             
             // Calculate new subtotal
             const subtotal = price * quantity;
             
             // Update the subtotal display
-            subtotalEl.textContent = '$' + subtotal.toFixed(2);
+            subtotalEl.textContent = '₹' + subtotal.toFixed(2);
             
             // Update cart totals
             updateCartTotals();
@@ -145,7 +145,7 @@ function updateCartTotals() {
     items.forEach(function(item) {
         const subtotalEl = item.querySelector('.product-subtotal');
         if (subtotalEl) {
-            const itemSubtotal = parseFloat(subtotalEl.textContent.replace('$', ''));
+            const itemSubtotal = parseFloat(subtotalEl.textContent.replace('₹', ''));
             subtotal += itemSubtotal;
         }
     });
@@ -155,11 +155,11 @@ function updateCartTotals() {
     const totalEl = document.getElementById('cart-total');
     
     if (subtotalEl) {
-        subtotalEl.textContent = '$' + subtotal.toFixed(2);
+        subtotalEl.textContent = '₹' + subtotal.toFixed(2);
     }
     
     if (totalEl) {
-        totalEl.textContent = '$' + subtotal.toFixed(2);
+        totalEl.textContent = '₹' + subtotal.toFixed(2);
     }
 }
 

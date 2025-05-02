@@ -8,6 +8,7 @@ function ensureBrandsTableExists($pdo) {
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL UNIQUE,
         image VARCHAR(255) NOT NULL,
+        sequence INT DEFAULT 999,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )";
     $pdo->exec($sql);
@@ -100,8 +101,9 @@ function ensureOrdersTableExists($pdo) {
         payment_status VARCHAR(50) NOT NULL DEFAULT 'pending',
         subtotal DECIMAL(10,2) NOT NULL,
         shipping_cost DECIMAL(10,2) DEFAULT 0.00,
+        gst_amount DECIMAL(10,2) DEFAULT 0.00,
         total DECIMAL(10,2) NOT NULL,
-        currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+        currency VARCHAR(10) NOT NULL DEFAULT 'INR',
         notes TEXT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -157,7 +159,7 @@ function ensurePaymentTransactionsTableExists($pdo) {
         transaction_id VARCHAR(255) NULL,
         payment_method VARCHAR(50) NOT NULL,
         amount DECIMAL(10,2) NOT NULL,
-        currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+        currency VARCHAR(10) NOT NULL DEFAULT 'INR',
         status VARCHAR(50) NOT NULL,
         gateway_response TEXT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -204,6 +206,20 @@ function updateProductsTableWithVehicleFields($pdo) {
     }
 }
 
+// Function to update orders table with GST field if it doesn't exist
+function updateOrdersTableWithGSTField($pdo) {
+    try {
+        // Check if gst_amount column already exists
+        $result = $pdo->query("SHOW COLUMNS FROM orders LIKE 'gst_amount'");
+        if ($result->rowCount() == 0) {
+            // Add the gst_amount column
+            $pdo->exec("ALTER TABLE orders ADD COLUMN gst_amount DECIMAL(10,2) DEFAULT 0.00 AFTER shipping_cost");
+        }
+    } catch (PDOException $e) {
+        echo "Error updating orders table: " . $e->getMessage();
+    }
+}
+
 // Create tables if they don't exist
 ensureBrandsTableExists($pdo);
 ensureCategoriesTableExists($pdo);
@@ -218,3 +234,6 @@ ensurePaymentTransactionsTableExists($pdo);
 
 // Update products table with vehicle fields
 updateProductsTableWithVehicleFields($pdo);
+
+// Update orders table with GST field
+updateOrdersTableWithGSTField($pdo);

@@ -113,18 +113,23 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 <?php foreach ($cartItems as $item): ?>
                     <div class="order-item">
                         <span class="item-name"><?php echo htmlspecialchars($item['title']); ?> × <?php echo $item['quantity']; ?></span>
-                        <span class="item-price">$<?php echo number_format($item['amount'] * $item['quantity'], 2); ?></span>
+                        <span class="item-price">₹<?php echo number_format($item['amount'] * $item['quantity'], 2); ?></span>
                     </div>
                 <?php endforeach; ?>
                 
                 <div class="order-subtotal">
                     <span>Subtotal</span>
-                    <span>$<?php echo number_format($cartSubtotal, 2); ?></span>
+                    <span>₹<?php echo number_format($cartSubtotal, 2); ?></span>
+                </div>
+                
+                <div class="order-subtotal">
+                    <span>GST (18%)</span>
+                    <span>₹<?php echo number_format($gstAmount, 2); ?></span>
                 </div>
                 
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$<?php echo number_format($cartTotal, 2); ?></span>
+                    <span>₹<?php echo number_format($cartTotal, 2); ?></span>
                 </div>
             </div>
             
@@ -150,11 +155,47 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <p class="payment-description">Pay securely with Razorpay. Credit/Debit Cards, Net Banking, UPI, and other payment methods supported.</p>
                 </div>
                 
-                <button type="submit" class="place-order-btn" form="checkout-form">Place order</button>
+                <button type="submit" class="place-order-btn" form="checkout-form" id="place-order-btn">Place order</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="assets/js/checkout.js" defer></script>
+<script>
+// Add additional debugging for the form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('checkout-form');
+    const submitBtn = document.getElementById('place-order-btn');
+    
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted');
+            
+            // Ensure payment method is selected
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            console.log('Selected payment method:', paymentMethod ? paymentMethod.value : 'none');
+            
+            if (!paymentMethod) {
+                e.preventDefault();
+                alert('Please select a payment method');
+                return false;
+            }
+            
+            // Add hidden input for payment method if it's not part of the form
+            if (!document.querySelector('input[name="payment_method"]')) {
+                const paymentInput = document.createElement('input');
+                paymentInput.type = 'hidden';
+                paymentInput.name = 'payment_method';
+                paymentInput.value = 'razorpay'; // Default to Razorpay
+                form.appendChild(paymentInput);
+            }
+            
+            // Display loading state
+            submitBtn.innerHTML = 'Processing...';
+            submitBtn.disabled = true;
+        });
+    }
+});
+</script>
 
