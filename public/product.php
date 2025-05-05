@@ -6,6 +6,9 @@
 // Include initialization script
 require_once __DIR__ . '/../includes/init.php';
 
+// Include shop functions
+require_once ROOT_PATH . '/app/core/shop.php';
+
 // Get product ID from URL
 $productId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -17,11 +20,17 @@ if ($productId <= 0) {
 
 // Get product details
 $product = getProductById($productId);
-
-// If product not found, redirect to shop page
 if (!$product) {
-    header('Location: shop.php');
+    header('Location: /');
     exit;
+}
+
+// Get device information if available
+if (!empty($product['device_id'])) {
+    $device = getDeviceById($product['device_id']);
+    if ($device) {
+        $product['device_name'] = $device['name'];
+    }
 }
 
 // Get product images

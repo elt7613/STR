@@ -10,6 +10,9 @@ require_once __DIR__ . '/../includes/init.php';
 // Include email functionality
 require_once ROOT_PATH . '/app/config/email.php';
 
+// Include discount functionality
+require_once ROOT_PATH . '/app/config/discount.php';
+
 // Initialize variables
 $error = '';
 $success = '';
@@ -30,11 +33,37 @@ foreach ($cartItems as $item) {
     $cartSubtotal += $item['amount'] * $item['quantity'];
 }
 
+// Check if user is premium and apply discount if applicable
+$isPremiumUser = false;
+$discountAmount = 0;
+$discountPercentage = 0;
+
+if (isset($_SESSION['user_id'])) {
+    // Check if the user is a premium member
+    try {
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT is_premium_member FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && $user['is_premium_member'] == 1) {
+            $isPremiumUser = true;
+            $discountPercentage = getPremiumDiscountPercentage();
+            $discountAmount = $cartSubtotal * ($discountPercentage / 100);
+        }
+    } catch (PDOException $e) {
+        error_log("Error checking premium status: " . $e->getMessage());
+    }
+}
+
+// Apply discount if user is premium
+$subtotalAfterDiscount = $cartSubtotal - $discountAmount;
+
 // Calculate GST (18%)
-$gstAmount = $cartSubtotal * 0.18;
+$gstAmount = $subtotalAfterDiscount * 0.18;
 
 // Calculate total with GST
-$cartTotal = $cartSubtotal + $shippingCost + $gstAmount;
+$cartTotal = $subtotalAfterDiscount + $shippingCost + $gstAmount;
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -65,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             $sessionId = session_id();
             
-            // Create order
+            // Create order with discount information
             $orderResult = createOrder(
                 $userId,
                 $sessionId,
@@ -74,7 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $shippingCost,
                 $cartTotal,
                 $orderNotes,
-                $gstAmount // Pass GST amount to createOrder
+                $gstAmount, // Pass GST amount to createOrder
+                $discountAmount, // Pass discount amount to createOrder
+                $discountPercentage // Pass discount percentage to createOrder
             );
             
             if ($orderResult['success']) {

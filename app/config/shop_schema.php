@@ -249,6 +249,27 @@ function updateCategoriesTableWithBrandField($pdo) {
     }
 }
 
+// Function to update orders table with discount fields
+function updateOrdersTableWithDiscountFields($pdo) {
+    try {
+        // Check if discount_amount column already exists
+        $result = $pdo->query("SHOW COLUMNS FROM orders LIKE 'discount_amount'");
+        if ($result->rowCount() == 0) {
+            // Add the discount_amount column
+            $pdo->exec("ALTER TABLE orders ADD COLUMN discount_amount DECIMAL(10,2) DEFAULT 0.00 AFTER gst_amount");
+        }
+        
+        // Check if discount_percentage column already exists
+        $result = $pdo->query("SHOW COLUMNS FROM orders LIKE 'discount_percentage'");
+        if ($result->rowCount() == 0) {
+            // Add the discount_percentage column
+            $pdo->exec("ALTER TABLE orders ADD COLUMN discount_percentage DECIMAL(5,2) DEFAULT 0.00 AFTER discount_amount");
+        }
+    } catch (PDOException $e) {
+        error_log("Error updating orders table with discount fields: " . $e->getMessage());
+    }
+}
+
 // Create tables if they don't exist
 ensureBrandsTableExists($pdo);
 ensureCategoriesTableExists($pdo);
@@ -269,3 +290,6 @@ updateOrdersTableWithGSTField($pdo);
 
 // Update categories table with brand_id field
 updateCategoriesTableWithBrandField($pdo);
+
+// Update orders table with discount fields
+updateOrdersTableWithDiscountFields($pdo);

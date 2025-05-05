@@ -31,6 +31,17 @@ function createVehicleTables($pdo) {
     )";
     $pdo->exec($sql);
     
+    // Vehicle Devices table
+    $sql = "CREATE TABLE IF NOT EXISTS vehicle_devices (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        series_id INT NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        UNIQUE KEY (series_id, name),
+        FOREIGN KEY (series_id) REFERENCES vehicle_series(id) ON DELETE CASCADE
+    )";
+    $pdo->exec($sql);
+    
     // Vehicle Submissions table
     $sql = "CREATE TABLE IF NOT EXISTS vehicle_submissions (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,15 +49,25 @@ function createVehicleTables($pdo) {
         make_id INT NOT NULL,
         model_id INT NOT NULL, 
         series_id INT NOT NULL,
+        device_id INT,
         phone VARCHAR(20) NOT NULL,
         email VARCHAR(100) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (make_id) REFERENCES vehicle_makes(id),
         FOREIGN KEY (model_id) REFERENCES vehicle_models(id),
-        FOREIGN KEY (series_id) REFERENCES vehicle_series(id)
+        FOREIGN KEY (series_id) REFERENCES vehicle_series(id),
+        FOREIGN KEY (device_id) REFERENCES vehicle_devices(id)
     )";
     $pdo->exec($sql);
+    
+    // Modify products table to add device_id if it doesn't exist already
+    $checkColumnExists = $pdo->query("SHOW COLUMNS FROM products LIKE 'device_id'");
+    if ($checkColumnExists->rowCount() == 0) {
+        $sql = "ALTER TABLE products ADD COLUMN device_id INT NULL, 
+                ADD FOREIGN KEY (device_id) REFERENCES vehicle_devices(id)";
+        $pdo->exec($sql);
+    }
 }
 
 // Create the vehicle tables

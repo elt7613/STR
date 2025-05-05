@@ -31,6 +31,44 @@ $brands = getAllBrands();
 // Get all categories for initial dropdown (will be filtered via AJAX)
 $categories = getAllCategories();
 
+// Get filter parameters from URL
+$makeId = isset($_POST['make_id']) ? intval($_POST['make_id']) : 0;
+$modelId = isset($_POST['model_id']) ? intval($_POST['model_id']) : 0;
+$seriesId = isset($_POST['series_id']) ? intval($_POST['series_id']) : 0;
+$deviceId = isset($_POST['device_id']) ? intval($_POST['device_id']) : 0;
+$categoryId = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+
+// If product is being edited, get the vehicle-related data
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $productId = (int)$_GET['id'];
+    $currentProduct = getProductById($productId);
+    
+    if ($currentProduct) {
+        $productImages = getProductImages($productId);
+        $productCategories = getProductCategoryIds($productId);
+        
+        // Get vehicle data to pre-populate dropdowns
+        if (!empty($currentProduct['make_id'])) {
+            $makeId = $currentProduct['make_id'];
+            $models = getVehicleModelsByMake($makeId);
+            
+            if (!empty($currentProduct['model_id'])) {
+                $modelId = $currentProduct['model_id'];
+                $series = getVehicleSeriesByModel($modelId);
+                
+                if (!empty($currentProduct['series_id'])) {
+                    $seriesId = $currentProduct['series_id'];
+                    $devices = getVehicleDevicesBySeries($seriesId);
+                    
+                    if (!empty($currentProduct['device_id'])) {
+                        $deviceId = $currentProduct['device_id'];
+                    }
+                }
+            }
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add or update product
     if (isset($_POST['action']) && ($_POST['action'] === 'add' || $_POST['action'] === 'update')) {
@@ -47,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $makeId = !empty($_POST['make_id']) ? intval($_POST['make_id']) : null;
         $modelId = !empty($_POST['model_id']) ? intval($_POST['model_id']) : null;
         $seriesId = !empty($_POST['series_id']) ? intval($_POST['series_id']) : null;
+        $deviceId = !empty($_POST['device_id']) ? intval($_POST['device_id']) : null;
         
         // Get direct_buying value (checkbox)
         $directBuying = isset($_POST['direct_buying']) ? 1 : 0;
@@ -56,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             if ($_POST['action'] === 'add') {
                 // Adding new product
-                $result = addProduct($brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying);
+                $result = addProduct($brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $deviceId, $directBuying);
                 if ($result['success']) {
                     $productId = $result['id'];
                     $success = $result['message'];
@@ -97,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             } else {
                 // Updating existing product
-                $result = updateProduct($productId, $brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying);
+                $result = updateProduct($productId, $brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $deviceId, $directBuying);
                 if ($result['success']) {
                     $success = $result['message'];
                     

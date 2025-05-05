@@ -190,7 +190,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 
 <!-- Main Shop Section -->
 <div class="container">
-    <h1 class="main-title">Our Brands</h1>
+    <h1 class="main-title">Shop</h1>
     
     <?php if (!empty($brands)): ?>
         <?php foreach ($brands as $brand): ?>
@@ -264,3 +264,5 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         });
     });
 </script>
+
+<?php require_once __DIR__ . '/partials/footer.php'; ?>

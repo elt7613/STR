@@ -151,111 +151,323 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 ?>
 
 <div class="container checkout-container">
-    <h1 class="page-title">Complete Your Payment</h1>
-    
-    <!-- Progress Steps -->
-    <div class="progress-steps">
-        <div class="step">
-            <div class="step-number">1</div>
-            <span class="step-text">Shopping Cart</span>
-            <div class="arrow">→</div>
-        </div>
-        <div class="step active">
-            <div class="step-number pink">2</div>
-            <span class="step-text">Payment & Delivery Options</span>
-            <div class="arrow">→</div>
-        </div>
-        <div class="step">
-            <div class="step-number">3</div>
-            <span class="step-text">Order Received</span>
-        </div>
-    </div>
-    
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger"><?php echo htmlspecialchars($_SESSION['error']); ?></div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
-    
-    <div class="order-summary">
-        <h2>Order Summary</h2>
+    <div class="payment-wrapper">
+        <h1 class="page-title">Complete Your Payment</h1>
         
-        <div class="order-details">
-            <div class="order-info">
-                <p><strong>Order Number:</strong> <?php echo htmlspecialchars($order['order_number']); ?></p>
-                <p><strong>Total Amount:</strong> ₹<?php echo number_format($order['total'], 2); ?></p>
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <span class="step-text">Shopping Cart</span>
+                <div class="arrow">→</div>
             </div>
-            
-            <div class="order-items">
-                <?php foreach ($orderItems as $item): ?>
-                    <div class="order-item">
-                        <span class="item-name"><?php echo htmlspecialchars($item['title']); ?> × <?php echo $item['quantity']; ?></span>
-                        <span class="item-price">₹<?php echo number_format($item['subtotal'], 2); ?></span>
+            <div class="step active">
+                <div class="step-number pink">2</div>
+                <span class="step-text">Payment & Delivery Options</span>
+                <div class="arrow">→</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <span class="step-text">Order Received</span>
+            </div>
+        </div>
+        
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <?php echo htmlspecialchars($_SESSION['error']); ?>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+        
+        <div class="payment-card">
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                
+                <div class="order-details">
+                    <div class="order-info">
+                        <div class="info-row">
+                            <span class="info-label">Order Number:</span>
+                            <span class="info-value"><?php echo htmlspecialchars($order['order_number']); ?></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Total Amount:</span>
+                            <span class="info-value amount">₹<?php echo number_format($order['total'], 2); ?></span>
+                        </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        
-        <div class="payment-container">
-            <h3>Complete Your Payment</h3>
-            <p>You have chosen to pay via Razorpay. Please click the button below to complete your payment.</p>
-            <p class="payment-note"><strong>Note:</strong> Your order will not be processed until payment is confirmed.</p>
-            
-            <div id="razorpay-button-container">
-                <button id="razorpay-payment-button" class="payment-button">
-                    <img src="assets/img/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
-                    Pay ₹<?php echo number_format($order['total'], 2); ?>
-                </button>
+                    
+                    <div class="order-items">
+                        <h3>Items in Order</h3>
+                        <?php foreach ($orderItems as $item): ?>
+                            <div class="order-item">
+                                <span class="item-name"><?php echo htmlspecialchars($item['title']); ?> × <?php echo $item['quantity']; ?></span>
+                                <span class="item-price">₹<?php echo number_format($item['subtotal'], 2); ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
             
-            <p class="payment-note">You will be redirected to Razorpay's secure payment page to complete your payment.</p>
+            <div class="payment-container">
+                <div class="payment-header">
+                    <h3>Complete Your Payment</h3>
+                    <div class="payment-method-logo">
+                        <img src="assets/img/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
+                    </div>
+                </div>
+                
+                <div class="payment-info">
+                    <p>You have chosen to pay via Razorpay. Please click the button below to complete your payment.</p>
+                    <p class="payment-note"><i class="fas fa-info-circle"></i> Your order will not be processed until payment is confirmed.</p>
+                </div>
+                
+                <div id="razorpay-button-container">
+                    <button id="razorpay-payment-button" class="payment-button">
+                        <span class="button-content">
+                            <img src="assets/img/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
+                            <span>Pay ₹<?php echo number_format($order['total'], 2); ?></span>
+                        </span>
+                        <span class="button-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Processing...
+                        </span>
+                    </button>
+                </div>
+                
+                <div class="payment-security">
+                    <i class="fas fa-lock"></i>
+                    <span>Secure Payment</span>
+                </div>
+                
+                <p class="payment-note redirect-note">
+                    <i class="fas fa-external-link-alt"></i>
+                    You will be redirected to Razorpay's secure payment page to complete your payment.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .payment-container {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        margin-top: 20px;
+    .payment-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
     }
-    
+
+    .payment-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: 2rem;
+    }
+
+    .order-summary {
+        padding: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-summary h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .order-details {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+    }
+
+    .info-label {
+        color: #666;
+    }
+
+    .info-value {
+        font-weight: 500;
+    }
+
+    .info-value.amount {
+        color: #2d84fb;
+        font-size: 1.2rem;
+    }
+
+    .order-items {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+    }
+
+    .order-items h3 {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: #444;
+    }
+
     .order-item {
         display: flex;
         justify-content: space-between;
-        padding: 10px 0;
+        padding: 0.75rem 0;
         border-bottom: 1px solid #eee;
     }
-    
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .payment-container {
+        padding: 2rem;
+    }
+
+    .payment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        color: #333;
+    }
+
+    .payment-method-logo {
+        height: 30px;
+    }
+
+    .payment-method-logo img {
+        height: 100%;
+    }
+
+    .payment-info {
+        margin-bottom: 2rem;
+    }
+
+    .payment-info p {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
     .payment-button {
-        background-color: #2d84fb;
+        background: #2d84fb;
         color: white;
         border: none;
-        padding: 12px 24px;
-        border-radius: 4px;
+        padding: 1rem 2rem;
+        border-radius: 8px;
         font-weight: 600;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 20px auto;
+        margin: 0 auto;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s ease;
+        width: 100%;
+        max-width: 300px;
+        position: relative;
+        overflow: hidden;
     }
-    
+
     .payment-button:hover {
-        background-color: #1a6ad2;
+        background: #1a6ad2;
+        transform: translateY(-2px);
     }
-    
-    .razorpay-logo {
-        height: 20px;
-        margin-right: 10px;
+
+    .payment-button .button-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-    
+
+    .payment-button .button-loading {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .payment-button.loading .button-content {
+        display: none;
+    }
+
+    .payment-button.loading .button-loading {
+        display: flex;
+    }
+
+    .payment-security {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: #666;
+        margin: 1.5rem 0;
+    }
+
     .payment-note {
         font-size: 0.9rem;
         color: #666;
         text-align: center;
-        margin-top: 15px;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .payment-note i {
+        color: #2d84fb;
+    }
+
+    .redirect-note {
+        margin-top: 2rem;
+    }
+
+    .alert-danger {
+        background: #fff3f3;
+        border: 1px solid #ffcdd2;
+        color: #d32f2f;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .alert-danger i {
+        color: #d32f2f;
+    }
+
+    @media (max-width: 768px) {
+        .payment-wrapper {
+            padding: 1rem;
+        }
+
+        .payment-card {
+            margin-top: 1rem;
+        }
+
+        .order-summary,
+        .payment-container {
+            padding: 1.5rem;
+        }
+
+        .payment-button {
+            padding: 0.875rem 1.5rem;
+        }
     }
 </style>
 
@@ -263,9 +475,13 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Log key information
+    const paymentButton = document.getElementById('razorpay-payment-button');
+    const buttonContainer = document.getElementById('razorpay-button-container');
+    
+    // Log key information for debugging
     console.log('Razorpay payment setup initializing');
     console.log('Order amount:', <?php echo $order['total']; ?>);
+    console.log('Razorpay Order ID:', '<?php echo isset($razorpayOrder['id']) ? $razorpayOrder['id'] : ''; ?>');
     
     const options = {
         key: '<?php echo RAZORPAY_KEY_ID; ?>',
@@ -288,10 +504,10 @@ document.addEventListener('DOMContentLoaded', function() {
             color: '#2d84fb'
         },
         handler: function(response) {
-            // Show loading indicator
-            document.getElementById('razorpay-button-container').innerHTML = '<div class="processing-payment">Processing payment, please wait...</div>';
+            // Show loading state
+            paymentButton.classList.add('loading');
             
-            // When payment is successful, submit form with payment details
+            // Create and submit form
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = 'razorpay-payment.php?order_id=<?php echo $orderId; ?>';
@@ -320,6 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modal: {
             ondismiss: function() {
                 console.log('Payment modal dismissed');
+                paymentButton.classList.remove('loading');
             },
             escape: true,
             backdropclose: false
@@ -328,33 +545,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const rzp = new Razorpay(options);
     
-    // Error handling for Razorpay
     rzp.on('payment.failed', function(response) {
         console.error('Payment failed:', response.error);
-        alert('Payment failed: ' + response.error.description);
+        paymentButton.classList.remove('loading');
+        buttonContainer.innerHTML = `
+            <div class="payment-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Payment failed: ${response.error.description}</p>
+                <button onclick="window.location.reload()" class="retry-button">Try Again</button>
+            </div>
+        `;
     });
     
+    paymentButton.onclick = function(e) {
+        e.preventDefault();
+        try {
+            rzp.open();
+        } catch (error) {
+            console.error('Error opening Razorpay:', error);
+            alert('Error opening payment form. Please try again.');
+        }
+    };
+
     // Auto-open Razorpay checkout if debug parameter is provided
     <?php if (isset($_GET['auto_open']) && $_GET['auto_open'] === '1'): ?>
     setTimeout(function() {
         try {
             rzp.open();
-        } catch (e) {
-            console.error('Error opening Razorpay:', e);
-            alert('Error opening payment form: ' + e.message);
+        } catch (error) {
+            console.error('Error auto-opening Razorpay:', error);
         }
     }, 1000);
     <?php endif; ?>
-    
-    document.getElementById('razorpay-payment-button').onclick = function(e) {
-        console.log('Payment button clicked, opening Razorpay');
-        try {
-            rzp.open();
-        } catch (e) {
-            console.error('Error opening Razorpay:', e);
-            alert('Error opening payment form: ' + e.message);
-        }
-        e.preventDefault();
-    };
 });
 </script>

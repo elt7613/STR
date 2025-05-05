@@ -58,6 +58,9 @@
                 <a href="manage_products.php" class="<?php echo $currentScript == 'manage_products.php' ? 'active' : ''; ?>">
                     <i class="fas fa-box"></i> Products
                 </a>
+                <a href="discount_settings.php" class="<?php echo $currentScript == 'discount_settings.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-percent"></i> Premium Discounts
+                </a>
                 <div class="nav-divider"></div>
                 <a href="../shop.php" target="_blank">
                     <i class="fas fa-external-link-alt"></i> View Frontend

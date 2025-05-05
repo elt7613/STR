@@ -98,6 +98,7 @@ function loginUser($username, $password) {
             $_SESSION['email'] = $user['email'];
             $_SESSION['phone'] = $user['phone'];
             $_SESSION['is_premium_member'] = $user['is_premium_member'];
+            $_SESSION['is_admin'] = $user['is_admin'];
             $_SESSION['loggedin'] = true;
             
             return ['success' => true, 'message' => 'Login successful'];

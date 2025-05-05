@@ -26,10 +26,23 @@ if (!$brand) {
     exit;
 }
 
+// Define constants with brand data that can't be overwritten
+if (!defined('SELECTED_BRAND_NAME')) {
+    define('SELECTED_BRAND_NAME', $brand['name']);
+}
+if (!defined('SELECTED_BRAND_ID')) {
+    define('SELECTED_BRAND_ID', $brand['id']);
+}
+
+// Store brand name securely to prevent it from being overwritten
+$brandName = SELECTED_BRAND_NAME;
+$brandId = SELECTED_BRAND_ID;
+
 // Get all vehicle makes for the filter dropdown
 $makes = getAllVehicleMakes();
 $models = [];
 $series = [];
+$devices = [];
 
 // Get categories for the brand (instead of all categories)
 $categories = getCategoriesByBrandId($brandId);
@@ -38,6 +51,7 @@ $categories = getCategoriesByBrandId($brandId);
 $makeId = isset($_GET['make_id']) ? intval($_GET['make_id']) : 0;
 $modelId = isset($_GET['model_id']) ? intval($_GET['model_id']) : 0;
 $seriesId = isset($_GET['series_id']) ? intval($_GET['series_id']) : 0;
+$deviceId = isset($_GET['device_id']) ? intval($_GET['device_id']) : 0;
 $categoryId = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
 
 // If make ID is provided, get models for that make
@@ -47,6 +61,11 @@ if ($makeId > 0) {
     // If model ID is provided, get series for that model
     if ($modelId > 0) {
         $series = getVehicleSeriesByModel($modelId);
+        
+        // If series ID is provided, get devices for that series
+        if ($seriesId > 0) {
+            $devices = getVehicleDevicesBySeries($seriesId);
+        }
     }
 }
 
@@ -54,7 +73,7 @@ if ($makeId > 0) {
 if ($categoryId > 0) {
     // If category filter is applied, we need to filter products by both brand and category
     $allCategoryProducts = getProductsByCategory($categoryId);
-    $products = array_filter($allCategoryProducts, function($product) use ($brandId, $makeId, $modelId, $seriesId) {
+    $products = array_filter($allCategoryProducts, function($product) use ($brandId, $makeId, $modelId, $seriesId, $deviceId) {
         // Match brand ID always
         if ($product['brand_id'] != $brandId) {
             return false;
@@ -75,15 +94,20 @@ if ($categoryId > 0) {
             return false;
         }
         
+        // Match device ID if specified
+        if ($deviceId > 0 && (!isset($product['device_id']) || $product['device_id'] != $deviceId)) {
+            return false;
+        }
+        
         return true;
     });
 } else {
     // If no category filter, use the standard function
-    $products = getAllProductsWithFilters($brandId, $makeId, $modelId, $seriesId);
+    $products = getAllProductsWithFilters($brandId, $makeId, $modelId, $seriesId, $deviceId);
 }
 
 // Check if vehicle filters were applied but no products found
-$vehicleFilterApplied = ($makeId > 0 || $modelId > 0 || $seriesId > 0);
+$vehicleFilterApplied = ($makeId > 0 || $modelId > 0 || $seriesId > 0 || $deviceId > 0);
 $noProductsFound = empty($products);
 
 // Send email to admin if vehicle filters applied but no products found
@@ -118,6 +142,15 @@ if ($vehicleFilterApplied && $noProductsFound) {
         }
     }
     
+    if ($deviceId > 0 && !empty($devices)) {
+        foreach ($devices as $device) {
+            if ($device['id'] == $deviceId) {
+                $filterDetails['device'] = $device['name'];
+                break;
+            }
+        }
+    }
+    
     // Get user information for the email
     $userInfo = [
         'is_logged_in' => isLoggedIn(),
@@ -134,7 +167,7 @@ if ($vehicleFilterApplied && $noProductsFound) {
     $htmlBody .= '<p>A user has searched for products with the following vehicle filters but found no results:</p>';
     $htmlBody .= '<h3>Filter Details:</h3>';
     $htmlBody .= '<ul>';
-    $htmlBody .= '<li><strong>Brand:</strong> ' . htmlspecialchars($brand['name']) . '</li>';
+    $htmlBody .= '<li><strong>Brand:</strong> ' . htmlspecialchars($brandName) . '</li>';
     
     if (isset($filterDetails['make'])) {
         $htmlBody .= '<li><strong>Make:</strong> ' . htmlspecialchars($filterDetails['make']) . '</li>';
@@ -146,6 +179,10 @@ if ($vehicleFilterApplied && $noProductsFound) {
     
     if (isset($filterDetails['series'])) {
         $htmlBody .= '<li><strong>Series:</strong> ' . htmlspecialchars($filterDetails['series']) . '</li>';
+    }
+    
+    if (isset($filterDetails['device'])) {
+        $htmlBody .= '<li><strong>Device:</strong> ' . htmlspecialchars($filterDetails['device']) . '</li>';
     }
     
     if ($categoryId > 0) {
@@ -176,7 +213,7 @@ if ($vehicleFilterApplied && $noProductsFound) {
     if ($userInfo['is_logged_in'] && !empty($userInfo['email'])) {
         // Use the centralized function to send notification to user
         sendVehicleSearchNotification(
-            $brand, 
+            ['id' => $brandId, 'name' => $brandName], // Use our saved brand information
             $filterDetails, 
             $userInfo['email'], 
             $userInfo['username'], 
@@ -195,6 +232,12 @@ function getBaseUrl() {
     $path = dirname($_SERVER['PHP_SELF']);
     return $protocol . $host . $path . '/';
 }
+
+// Right before including the view, make sure the $brand variable is correct
+$brand = [
+    'id' => SELECTED_BRAND_ID,
+    'name' => SELECTED_BRAND_NAME
+];
 
 // Include brand view
 require_once ROOT_PATH . '/app/views/brand.php';

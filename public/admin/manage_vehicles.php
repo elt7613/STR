@@ -196,6 +196,61 @@ if (isset($_POST['add_series'])) {
     }
 }
 
+// Handle Device CRUD operations
+if (isset($_POST['add_device'])) {
+    $seriesId = (int)$_POST['series_id'];
+    $deviceName = trim($_POST['device_name']);
+    $deviceDescription = trim($_POST['device_description'] ?? '');
+    
+    if (empty($deviceName)) {
+        $error = 'Device name cannot be empty';
+    } else {
+        try {
+            $result = addVehicleDevice($seriesId, $deviceName, $deviceDescription);
+            if ($result['success']) {
+                $success = $result['message'];
+            } else {
+                $error = $result['message'];
+            }
+        } catch (PDOException $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+} elseif (isset($_POST['edit_device'])) {
+    $deviceId = (int)$_POST['device_id'];
+    $seriesId = (int)$_POST['series_id'];
+    $deviceName = trim($_POST['device_name']);
+    $deviceDescription = trim($_POST['device_description'] ?? '');
+    
+    if (empty($deviceName)) {
+        $error = 'Device name cannot be empty';
+    } else {
+        try {
+            $result = updateVehicleDevice($deviceId, $seriesId, $deviceName, $deviceDescription);
+            if ($result['success']) {
+                $success = $result['message'];
+            } else {
+                $error = $result['message'];
+            }
+        } catch (PDOException $e) {
+            $error = 'Database error: ' . $e->getMessage();
+        }
+    }
+} elseif (isset($_POST['delete_device'])) {
+    $deviceId = (int)$_POST['device_id'];
+    
+    try {
+        $result = deleteVehicleDevice($deviceId);
+        if ($result['success']) {
+            $success = $result['message'];
+        } else {
+            $error = $result['message'];
+        }
+    } catch (PDOException $e) {
+        $error = 'Database error: ' . $e->getMessage();
+    }
+}
+
 // Get all makes for display
 $makes = getAllVehicleMakes();
 
@@ -259,6 +314,43 @@ if (isset($_GET['edit_series']) && !empty($_GET['edit_series'])) {
         $stmt = $pdo->prepare("SELECT vm.make_id FROM vehicle_models vm WHERE vm.id = ?");
         $stmt->execute([$editingSeries['model_id']]);
         $seriesModelMakeId = $stmt->fetchColumn();
+    }
+}
+
+// After the code getting specific series details if editing
+// Add code to get devices for a series
+$viewingSeriesId = null;
+$devices = [];
+if (isset($_GET['view_devices']) && !empty($_GET['view_devices'])) {
+    $viewingSeriesId = (int)$_GET['view_devices'];
+    $devices = getVehicleDevicesBySeries($viewingSeriesId);
+    
+    // Get series name and model details
+    $stmt = $pdo->prepare("SELECT vs.name as series_name, vm.id as model_id, vm.name as model_name, vmk.id as make_id, vmk.name as make_name 
+                        FROM vehicle_series vs 
+                        JOIN vehicle_models vm ON vs.model_id = vm.id 
+                        JOIN vehicle_makes vmk ON vm.make_id = vmk.id 
+                        WHERE vs.id = ?");
+    $stmt->execute([$viewingSeriesId]);
+    $viewingSeriesDetails = $stmt->fetch();
+}
+
+// Get specific device details if editing
+$editingDevice = null;
+if (isset($_GET['edit_device']) && !empty($_GET['edit_device'])) {
+    $deviceId = (int)$_GET['edit_device'];
+    $editingDevice = getVehicleDeviceById($deviceId);
+    
+    if ($editingDevice) {
+        // Get series details for this device
+        $stmt = $pdo->prepare("SELECT vs.id as series_id, vs.name as series_name, vm.id as model_id, vm.name as model_name, vmk.id as make_id, vmk.name as make_name 
+                            FROM vehicle_devices vd 
+                            JOIN vehicle_series vs ON vd.series_id = vs.id 
+                            JOIN vehicle_models vm ON vs.model_id = vm.id 
+                            JOIN vehicle_makes vmk ON vm.make_id = vmk.id 
+                            WHERE vd.id = ?");
+        $stmt->execute([$deviceId]);
+        $editingDeviceDetails = $stmt->fetch();
     }
 }
 
@@ -375,9 +467,113 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                         <a href="manage_vehicles.php?view_series=<?php echo $viewingModelId; ?>&edit_series=<?php echo $s['id']; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
+                                        <a href="manage_vehicles.php?view_devices=<?php echo $s['id']; ?>" class="btn btn-sm btn-info">
+                                            <i class="fas fa-microchip"></i> Manage Devices
+                                        </a>
                                         <form method="post" action="manage_vehicles.php?view_series=<?php echo $viewingModelId; ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this series?');">
                                             <input type="hidden" name="series_id" value="<?php echo $s['id']; ?>">
                                             <button type="submit" name="delete_series" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php elseif (isset($viewingSeriesId)): ?>
+    <!-- Device Management Section -->
+    <div class="mb-4">
+        <div class="form-section">
+            <h3>Manage Devices for <?php echo htmlspecialchars($viewingSeriesDetails['series_name']); ?></h3>
+            
+            <!-- Breadcrumb for device view -->
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="manage_vehicles.php">All Makes</a></li>
+                        <li class="breadcrumb-item"><a href="manage_vehicles.php?view_models=<?php echo $viewingSeriesDetails['make_id']; ?>">
+                            <?php echo htmlspecialchars($viewingSeriesDetails['make_name']); ?> Models
+                        </a></li>
+                        <li class="breadcrumb-item"><a href="manage_vehicles.php?view_series=<?php echo $viewingSeriesDetails['model_id']; ?>">
+                            <?php echo htmlspecialchars($viewingSeriesDetails['model_name']); ?> Series
+                        </a></li>
+                        <li class="breadcrumb-item active"><?php echo htmlspecialchars($viewingSeriesDetails['series_name']); ?> Devices</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <?php if ($editingDevice): ?>
+                <h4 class="mb-3">Edit Device</h4>
+                <form method="post" action="manage_vehicles.php?view_devices=<?php echo $viewingSeriesId; ?>">
+                    <input type="hidden" name="device_id" value="<?php echo $editingDevice['id']; ?>">
+                    <input type="hidden" name="series_id" value="<?php echo $viewingSeriesId; ?>">
+                    <div class="mb-3">
+                        <label for="device_name" class="form-label">Device Name:</label>
+                        <input type="text" class="form-control" id="device_name" name="device_name" value="<?php echo htmlspecialchars($editingDevice['name']); ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="device_description" class="form-label">Description (Optional):</label>
+                        <textarea class="form-control" id="device_description" name="device_description" rows="3"><?php echo htmlspecialchars($editingDevice['description']); ?></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" name="edit_device" class="btn btn-primary">Update Device</button>
+                        <a href="manage_vehicles.php?view_devices=<?php echo $viewingSeriesId; ?>" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            <?php else: ?>
+                <h4 class="mb-3">Add New Device</h4>
+                <form method="post" action="manage_vehicles.php?view_devices=<?php echo $viewingSeriesId; ?>">
+                    <input type="hidden" name="series_id" value="<?php echo $viewingSeriesId; ?>">
+                    <div class="mb-3">
+                        <label for="device_name" class="form-label">Device Name:</label>
+                        <input type="text" class="form-control" id="device_name" name="device_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="device_description" class="form-label">Description (Optional):</label>
+                        <textarea class="form-control" id="device_description" name="device_description" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" name="add_device" class="btn btn-primary">Add Device</button>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
+        
+        <div class="form-section">
+            <h3>Device List</h3>
+            <?php if (empty($devices)): ?>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No devices found for this series.
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($devices as $device): ?>
+                                <tr>
+                                    <td><?php echo $device['id']; ?></td>
+                                    <td><?php echo htmlspecialchars($device['name']); ?></td>
+                                    <td><?php echo !empty($device['description']) ? htmlspecialchars($device['description']) : '<em>No description</em>'; ?></td>
+                                    <td>
+                                        <a href="manage_vehicles.php?view_devices=<?php echo $viewingSeriesId; ?>&edit_device=<?php echo $device['id']; ?>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form method="post" action="manage_vehicles.php?view_devices=<?php echo $viewingSeriesId; ?>" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this device?');">
+                                            <input type="hidden" name="device_id" value="<?php echo $device['id']; ?>">
+                                            <button type="submit" name="delete_device" class="btn btn-sm btn-danger">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>
                                         </form>

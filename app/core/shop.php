@@ -179,12 +179,13 @@ function getAllProducts($brandId = null) {
             $stmt = $pdo->prepare("
                 SELECT p.*, b.name as brand_name, 
                        (SELECT image_path FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) as primary_image,
-                       vm.name as make_name, vmo.name as model_name, vs.name as series_name
+                       vm.name as make_name, vmo.name as model_name, vs.name as series_name, vd.name as device_name
                 FROM products p
                 JOIN brands b ON p.brand_id = b.id
                 LEFT JOIN vehicle_makes vm ON p.make_id = vm.id
                 LEFT JOIN vehicle_models vmo ON p.model_id = vmo.id
                 LEFT JOIN vehicle_series vs ON p.series_id = vs.id
+                LEFT JOIN vehicle_devices vd ON p.device_id = vd.id
                 WHERE p.brand_id = ?
                 ORDER BY p.created_at DESC
             ");
@@ -193,12 +194,13 @@ function getAllProducts($brandId = null) {
             $stmt = $pdo->query("
                 SELECT p.*, b.name as brand_name,
                        (SELECT image_path FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) as primary_image,
-                       vm.name as make_name, vmo.name as model_name, vs.name as series_name
+                       vm.name as make_name, vmo.name as model_name, vs.name as series_name, vd.name as device_name
                 FROM products p
                 JOIN brands b ON p.brand_id = b.id
                 LEFT JOIN vehicle_makes vm ON p.make_id = vm.id
                 LEFT JOIN vehicle_models vmo ON p.model_id = vmo.id
                 LEFT JOIN vehicle_series vs ON p.series_id = vs.id
+                LEFT JOIN vehicle_devices vd ON p.device_id = vd.id
                 ORDER BY p.created_at DESC
             ");
         }
@@ -225,12 +227,13 @@ function getProductById($productId) {
     try {
         $stmt = $pdo->prepare("
             SELECT p.*, b.name as brand_name, b.id as brand_id,
-                   vm.name as make_name, vmo.name as model_name, vs.name as series_name
+                   vm.name as make_name, vmo.name as model_name, vs.name as series_name, vd.name as device_name
             FROM products p
             JOIN brands b ON p.brand_id = b.id
             LEFT JOIN vehicle_makes vm ON p.make_id = vm.id
             LEFT JOIN vehicle_models vmo ON p.model_id = vmo.id
             LEFT JOIN vehicle_series vs ON p.series_id = vs.id
+            LEFT JOIN vehicle_devices vd ON p.device_id = vd.id
             WHERE p.id = ?
         ");
         $stmt->execute([$productId]);
@@ -264,7 +267,7 @@ function getProductImages($productId) {
 }
 
 /**
- * Add new product
+ * Add product
  * 
  * @param int $brandId Brand ID
  * @param string $title Product title
@@ -273,10 +276,11 @@ function getProductImages($productId) {
  * @param int|null $makeId Make ID (optional)
  * @param int|null $modelId Model ID (optional)
  * @param int|null $seriesId Series ID (optional)
+ * @param int|null $deviceId Device ID (optional)
  * @param int $directBuying Whether direct buying is enabled (optional, defaults to 0)
  * @return array Result with status and message
  */
-function addProduct($brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $directBuying = 0) {
+function addProduct($brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $deviceId = null, $directBuying = 0) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -295,8 +299,8 @@ function addProduct($brandId, $title, $amount, $description, $makeId = null, $mo
         $pdo->beginTransaction();
         
         // Insert new product
-        $stmt = $pdo->prepare("INSERT INTO products (brand_id, title, amount, description, make_id, model_id, series_id, direct_buying) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying]);
+        $stmt = $pdo->prepare("INSERT INTO products (brand_id, title, amount, description, make_id, model_id, series_id, device_id, direct_buying) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $deviceId, $directBuying]);
         $productId = $pdo->lastInsertId();
         
         // Commit transaction
@@ -327,10 +331,11 @@ function addProduct($brandId, $title, $amount, $description, $makeId = null, $mo
  * @param int|null $makeId Make ID (optional)
  * @param int|null $modelId Model ID (optional)
  * @param int|null $seriesId Series ID (optional)
+ * @param int|null $deviceId Device ID (optional)
  * @param int $directBuying Whether direct buying is enabled (optional)
  * @return array Result with status and message
  */
-function updateProduct($productId, $brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $directBuying = 0) {
+function updateProduct($productId, $brandId, $title, $amount, $description, $makeId = null, $modelId = null, $seriesId = null, $deviceId = null, $directBuying = 0) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -347,10 +352,10 @@ function updateProduct($productId, $brandId, $title, $amount, $description, $mak
     try {
         $stmt = $pdo->prepare("
             UPDATE products 
-            SET brand_id = ?, title = ?, amount = ?, description = ?, make_id = ?, model_id = ?, series_id = ?, direct_buying = ? 
+            SET brand_id = ?, title = ?, amount = ?, description = ?, make_id = ?, model_id = ?, series_id = ?, device_id = ?, direct_buying = ? 
             WHERE id = ?
         ");
-        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $directBuying, $productId]);
+        $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $deviceId, $directBuying, $productId]);
         
         return ['success' => true, 'message' => 'Product updated successfully'];
     } catch (PDOException $e) {
@@ -505,15 +510,16 @@ function setImageAsPrimary($imageId, $productId) {
 }
 
 /**
- * Get all products with optional filters
+ * Get all products with filtering options
  * 
  * @param int|null $brandId Optional brand ID to filter by
  * @param int|null $makeId Optional make ID to filter by
  * @param int|null $modelId Optional model ID to filter by
  * @param int|null $seriesId Optional series ID to filter by
+ * @param int|null $deviceId Optional device ID to filter by
  * @return array List of filtered products
  */
-function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = null, $seriesId = null) {
+function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = null, $seriesId = null, $deviceId = null) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -526,12 +532,13 @@ function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = n
         $sql = "
             SELECT p.*, b.name as brand_name,
                    (SELECT image_path FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) as primary_image,
-                   vm.name as make_name, vmo.name as model_name, vs.name as series_name
+                   vm.name as make_name, vmo.name as model_name, vs.name as series_name, vd.name as device_name
             FROM products p
             JOIN brands b ON p.brand_id = b.id
             LEFT JOIN vehicle_makes vm ON p.make_id = vm.id
             LEFT JOIN vehicle_models vmo ON p.model_id = vmo.id
             LEFT JOIN vehicle_series vs ON p.series_id = vs.id
+            LEFT JOIN vehicle_devices vd ON p.device_id = vd.id
             WHERE 1=1";
         
         // Add brand filter if provided
@@ -556,6 +563,12 @@ function getAllProductsWithFilters($brandId = null, $makeId = null, $modelId = n
         if ($seriesId) {
             $sql .= " AND p.series_id = ?";
             $params[] = $seriesId;
+        }
+        
+        // Add device filter if provided
+        if ($deviceId) {
+            $sql .= " AND p.device_id = ?";
+            $params[] = $deviceId;
         }
         
         // Add ordering
@@ -1220,7 +1233,7 @@ function getCartItemCount() {
 }
 
 /**
- * Create a new order
+ * Create a new order from cart items
  * 
  * @param int|null $userId User ID if logged in
  * @param string $sessionId Session ID
@@ -1230,9 +1243,11 @@ function getCartItemCount() {
  * @param float $total Order total
  * @param string $notes Order notes
  * @param float $gstAmount GST amount
+ * @param float $discountAmount Discount amount (default 0)
+ * @param float $discountPercentage Discount percentage (default 0)
  * @return array Array with success status and order ID or error message
  */
-function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCost, $total, $notes = '', $gstAmount = 0) {
+function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCost, $total, $notes = '', $gstAmount = 0, $discountAmount = 0, $discountPercentage = 0) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -1254,10 +1269,12 @@ function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCo
         $stmt = $pdo->prepare("
             INSERT INTO orders (
                 order_number, user_id, session_id, payment_method, 
-                subtotal, shipping_cost, gst_amount, total, notes
+                subtotal, shipping_cost, gst_amount, discount_amount, discount_percentage, total, notes,
+                created_at, updated_at
             ) VALUES (
                 :order_number, :user_id, :session_id, :payment_method, 
-                :subtotal, :shipping_cost, :gst_amount, :total, :notes
+                :subtotal, :shipping_cost, :gst_amount, :discount_amount, :discount_percentage, :total, :notes,
+                NOW(), NOW()
             )
         ");
         
@@ -1269,6 +1286,8 @@ function createOrder($userId, $sessionId, $paymentMethod, $subtotal, $shippingCo
             ':subtotal' => $subtotal,
             ':shipping_cost' => $shippingCost,
             ':gst_amount' => $gstAmount,
+            ':discount_amount' => $discountAmount,
+            ':discount_percentage' => $discountPercentage,
             ':total' => $total,
             ':notes' => $notes
         ]);
@@ -1342,11 +1361,13 @@ function addBillingDetails($orderId, $billingData) {
             INSERT INTO billing_details (
                 order_id, first_name, last_name, company_name, country, 
                 street_address_1, street_address_2, city, state, postcode, 
-                phone, email
+                phone, email,
+                created_at, updated_at
             ) VALUES (
                 :order_id, :first_name, :last_name, :company_name, :country, 
                 :street_address_1, :street_address_2, :city, :state, :postcode, 
-                :phone, :email
+                :phone, :email,
+                NOW(), NOW()
             )
         ");
         
@@ -1406,10 +1427,12 @@ function recordPaymentTransaction($orderId, $transactionId, $paymentMethod, $amo
         $stmt = $pdo->prepare("
             INSERT INTO payment_transactions (
                 order_id, transaction_id, payment_method, 
-                amount, status, gateway_response
+                amount, status, gateway_response,
+                created_at
             ) VALUES (
                 :order_id, :transaction_id, :payment_method, 
-                :amount, :status, :gateway_response
+                :amount, :status, :gateway_response,
+                NOW()
             )
         ");
         
@@ -1613,9 +1636,13 @@ function getAllOrders($filters = []) {
         LEFT JOIN users u ON o.user_id = u.id
         LEFT JOIN billing_details bd ON o.id = bd.order_id
         LEFT JOIN (
-            SELECT order_id, transaction_id, status
-            FROM payment_transactions 
-            ORDER BY created_at DESC
+            SELECT pt1.order_id, pt1.transaction_id, pt1.status
+            FROM payment_transactions pt1
+            INNER JOIN (
+                SELECT order_id, MAX(created_at) as latest_date
+                FROM payment_transactions
+                GROUP BY order_id
+            ) pt2 ON pt1.order_id = pt2.order_id AND pt1.created_at = pt2.latest_date
         ) pt ON o.id = pt.order_id
         WHERE 1=1";
         
@@ -1890,6 +1917,58 @@ function getOrderCountByStatus($status) {
     } catch (PDOException $e) {
         error_log('Error getting order count by status: ' . $e->getMessage());
         return 0;
+    }
+}
+
+/**
+ * Get count of products associated with a device
+ * 
+ * @param int $deviceId Device ID
+ * @return int Count of associated products
+ */
+function getDeviceProductCount($deviceId) {
+    /** @var \PDO $pdo */
+    global $pdo;
+    
+    if (!$pdo || !$deviceId) {
+        return 0;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM products WHERE device_id = ?");
+        $stmt->execute([$deviceId]);
+        return (int)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
+ * Get device by ID
+ * 
+ * @param int $deviceId Device ID
+ * @return array|false Device data or false if not found
+ */
+function getDeviceById($deviceId) {
+    /** @var \PDO $pdo */
+    global $pdo;
+    
+    if (!$pdo) {
+        error_log("Database connection error in getDeviceById");
+        return false;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("
+            SELECT id, name, series_id, created_at, updated_at
+            FROM devices
+            WHERE id = ?
+        ");
+        $stmt->execute([$deviceId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error getting device by ID: " . $e->getMessage());
+        return false;
     }
 }
 ?> 

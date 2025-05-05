@@ -1,5 +1,5 @@
 <?php 
-$pageTitle = htmlspecialchars($brand['name']) . ' - STR Works';
+$pageTitle = htmlspecialchars(SELECTED_BRAND_NAME) . ' - STR Works';
 $custom_css = 'brand.css';
 require_once ROOT_PATH . '/app/views/partials/header.php'; 
 ?>
@@ -7,7 +7,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
 <!-- Products Section -->
 <div class="product-section">
     <div class="container">
-        <h2 class="section-title">Products</h2>
+        <h2 class="section-title"><?php echo htmlspecialchars(SELECTED_BRAND_NAME); ?></h2>
         
         <!-- Modern Filter Section -->
         <div class="filter-container mb-4">
@@ -19,7 +19,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
             <div class="collapse show" id="filterCollapse">
                 <div class="filter-body">
                     <form action="brand.php" method="get" id="filter-form">
-                        <input type="hidden" name="id" value="<?php echo $brandId; ?>">
+                        <input type="hidden" name="id" value="<?php echo SELECTED_BRAND_ID; ?>">
                         
                         <div class="filter-grid">
                             <div class="filter-group">
@@ -77,13 +77,27 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="filter-group">
+                                <label for="device_id" class="filter-label">Vehicle Device</label>
+                                <div class="custom-select-wrapper">
+                                    <select class="custom-select" id="device_id" name="device_id" <?php echo empty($devices) && empty($deviceId) ? 'disabled' : ''; ?>>
+                                        <option value="">All Devices</option>
+                                        <?php foreach ($devices as $device): ?>
+                                            <option value="<?php echo $device['id']; ?>" <?php echo $deviceId == $device['id'] ? 'selected' : ''; ?>>
+                                                <?php echo htmlspecialchars($device['name']); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="filter-actions">
                             <button type="submit" class="btn-apply">
                                 <i class="fas fa-check me-2"></i>Apply Filters
                             </button>
-                            <a href="brand.php?id=<?php echo $brandId; ?>" class="btn-reset">
+                            <a href="brand.php?id=<?php echo SELECTED_BRAND_ID; ?>" class="btn-reset">
                                 <i class="fas fa-undo me-2"></i>Reset
                             </a>
                         </div>
@@ -93,7 +107,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         </div>
         
         <!-- Active Filters Display -->
-        <?php if ($categoryId > 0 || $makeId > 0 || $modelId > 0 || $seriesId > 0): ?>
+        <?php if ($categoryId > 0 || $makeId > 0 || $modelId > 0 || $seriesId > 0 || $deviceId > 0): ?>
         <div class="active-filters mb-4">
             <p><i class="fas fa-tag me-2"></i>Active Filters:</p>
             <div class="filter-tags">
@@ -156,8 +170,23 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <a href="<?php echo removeQueryParam($_SERVER['REQUEST_URI'], 'series_id'); ?>" class="remove-filter">×</a>
                 </span>
                 <?php endif; ?>
+
+                <?php if ($deviceId > 0 && !empty($devices)): 
+                    $deviceName = '';
+                    foreach ($devices as $d) {
+                        if ($d['id'] == $deviceId) {
+                            $deviceName = $d['name'];
+                            break;
+                        }
+                    }
+                ?>
+                <span class="filter-tag">
+                    <span class="filter-label">Device:</span> <?php echo htmlspecialchars($deviceName); ?>
+                    <a href="<?php echo removeQueryParam($_SERVER['REQUEST_URI'], 'device_id'); ?>" class="remove-filter">×</a>
+                </span>
+                <?php endif; ?>
                 
-                <a href="brand.php?id=<?php echo $brandId; ?>" class="clear-all-filters">Clear All</a>
+                <a href="brand.php?id=<?php echo SELECTED_BRAND_ID; ?>" class="clear-all-filters">Clear All</a>
             </div>
         </div>
         <?php endif; ?>
@@ -192,7 +221,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                             <p>We've notified our team about your search. We'll consider adding products for this vehicle in the future!</p>
                         </div> -->
                     <?php endif; ?>
-                    <a href="brand.php?id=<?php echo $brandId; ?>" class="btn btn-outline-primary mt-3">Clear Filters</a>
+                    <a href="brand.php?id=<?php echo SELECTED_BRAND_ID; ?>" class="btn btn-outline-primary mt-3">Clear Filters</a>
                 </div>
             <?php endif; ?>
         </div>
@@ -211,6 +240,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         const makeSelect = document.getElementById('make_id');
         const modelSelect = document.getElementById('model_id');
         const seriesSelect = document.getElementById('series_id');
+        const deviceSelect = document.getElementById('device_id');
         const filterHeader = document.querySelector('.filter-header');
         const filterToggle = document.querySelector('.filter-toggle');
         
@@ -282,6 +312,32 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     updateSelect(seriesSelect, [], 'Error loading series', true);
                 });
         }
+
+        // Function to fetch devices for a selected series
+        function fetchDevices(seriesId) {
+            if (!seriesId) {
+                updateSelect(deviceSelect, [], 'All Devices', true);
+                return;
+            }
+            
+            // Show loading state
+            updateSelect(deviceSelect, [], 'Loading devices...', true);
+            
+            // Fetch devices using AJAX
+            fetch('../api/get_devices.php?series_id=' + seriesId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        updateSelect(deviceSelect, data, 'All Devices', false);
+                    } else {
+                        updateSelect(deviceSelect, [], 'No devices available', true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching devices:', error);
+                    updateSelect(deviceSelect, [], 'Error loading devices', true);
+                });
+        }
         
         // Helper function to update select options
         function updateSelect(selectElement, data, defaultOptionText, isDisabled) {
@@ -308,6 +364,12 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         if (modelSelect) {
             modelSelect.addEventListener('change', function() {
                 fetchSeries(this.value);
+            });
+        }
+
+        if (seriesSelect) {
+            seriesSelect.addEventListener('change', function() {
+                fetchDevices(this.value);
             });
         }
         
@@ -343,3 +405,4 @@ function removeQueryParam($url, $param) {
 }
 ?>
 
+<?php require_once __DIR__ . '/partials/footer.php'; ?>

@@ -102,6 +102,20 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                     <?php endforeach; ?>
                 </select>
             </div>
+            
+            <div class="col-md-4 mb-3">
+                <label for="deviceId" class="form-label">Vehicle Device (Optional)</label>
+                <select class="form-select" id="deviceId" name="device_id" <?php echo empty($devices) ? 'disabled' : ''; ?>>
+                    <option value="">-- Select Device --</option>
+                    <?php if (!empty($devices)): ?>
+                        <?php foreach ($devices as $device): ?>
+                            <option value="<?php echo $device['id']; ?>" <?php echo (isset($currentProduct) && isset($currentProduct['device_id']) && $currentProduct['device_id'] == $device['id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($device['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
         </div>
         
         <div class="row">
@@ -261,7 +275,11 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                                 <div><strong>Series:</strong> <?php echo htmlspecialchars($product['series_name']); ?></div>
                             <?php endif; ?>
                             
-                            <?php if (empty($product['make_name']) && empty($product['model_name']) && empty($product['series_name'])): ?>
+                            <?php if (!empty($product['device_name'])): ?>
+                                <div><strong>Device:</strong> <?php echo htmlspecialchars($product['device_name']); ?></div>
+                            <?php endif; ?>
+                            
+                            <?php if (empty($product['make_name']) && empty($product['model_name']) && empty($product['series_name']) && empty($product['device_name'])): ?>
                                 <span class="text-muted">None specified</span>
                             <?php endif; ?>
                         </td>
@@ -369,6 +387,13 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             <label for="edit_seriesId" class="form-label">Vehicle Series (Optional)</label>
                             <select class="form-select" id="edit_seriesId" name="series_id">
                                 <option value="">-- Select Series --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="edit_deviceId" class="form-label">Vehicle Device (Optional)</label>
+                            <select class="form-select" id="edit_deviceId" name="device_id">
+                                <option value="">-- Select Device --</option>
                             </select>
                         </div>
                     </div>
@@ -897,6 +922,30 @@ document.addEventListener('DOMContentLoaded', function() {
                                                             option.selected = series.id == product.series_id;
                                                             editSeriesSelect.appendChild(option);
                                                         });
+                                                        
+                                                        // If series is selected, fetch devices
+                                                        if (product.series_id) {
+                                                            fetch(`../api/get_devices.php?series_id=${product.series_id}`)
+                                                                .then(response => response.json())
+                                                                .then(deviceData => {
+                                                                    if (deviceData && deviceData.length > 0) {
+                                                                        const editDeviceSelect = document.getElementById('edit_deviceId');
+                                                                        editDeviceSelect.innerHTML = '<option value="">-- Select Device --</option>';
+                                                                        editDeviceSelect.disabled = false;
+                                                                        
+                                                                        deviceData.forEach(device => {
+                                                                            const option = document.createElement('option');
+                                                                            option.value = device.id;
+                                                                            option.textContent = device.name;
+                                                                            option.selected = device.id == product.device_id;
+                                                                            editDeviceSelect.appendChild(option);
+                                                                        });
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    console.error('Error fetching device data:', error);
+                                                                });
+                                                        }
                                                     }
                                                 })
                                                 .catch(error => {
@@ -1087,11 +1136,129 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Make model and series fields in edit modal depend on make selection
+    // Define all edit form variables once and only once
+    const editProductForm = document.getElementById('editProductForm');
     const editMakeSelect = document.getElementById('edit_makeId');
     const editModelSelect = document.getElementById('edit_modelId');
     const editSeriesSelect = document.getElementById('edit_seriesId');
+    const editDeviceSelect = document.getElementById('edit_deviceId');
+    const editBrandSelect = document.getElementById('edit_brandId');
+    const editCategorySelect = document.getElementById('edit_categories');
+
+    // Handle edit product form submission
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Edit product form submitted');
+            const formData = new FormData(this);
+            
+            fetch('../admin/manage_products.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // If response is not JSON, reload the page to show the updated data
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    window.location.reload();
+                    return;
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success) {
+                    // Close the modal - use jQuery first as it's more reliable
+                    const editModalElement = document.getElementById('editProductModal');
+                    try {
+                        console.log('Attempting to close modal with jQuery');
+                        $(editModalElement).modal('hide');
+                        console.log('Modal hidden via jQuery');
+                    } catch (e) {
+                        console.log('jQuery modal hiding failed, trying Bootstrap 5:', e);
+                        try {
+                            // Try Bootstrap 5 way
+                            const editModal = bootstrap.Modal.getInstance(editModalElement);
+                            if (editModal) {
+                                editModal.hide();
+                                console.log('Modal hidden via Bootstrap 5 API');
+                            } else {
+                                throw new Error('No Bootstrap 5 modal instance found');
+                            }
+                        } catch (e2) {
+                            console.error('All modal closing methods failed:', e2);
+                            // Try direct manipulation as last resort
+                            try {
+                                editModalElement.classList.remove('show');
+                                editModalElement.style.display = 'none';
+                                document.body.classList.remove('modal-open');
+                                const backdrops = document.querySelectorAll('.modal-backdrop');
+                                backdrops.forEach(el => el.remove());
+                                console.log('Modal hidden via direct DOM manipulation');
+                            } catch (e3) {
+                                console.error('Even direct manipulation failed:', e3);
+                            }
+                        }
+                    }
+                    
+                    // Show success message and reload page
+                    alert(data.message || 'Product updated successfully!');
+                    window.location.reload();
+                } else if (data) {
+                    alert(data.message || 'Error updating product. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+                alert('Error updating product. Please try again.');
+            });
+        });
+    }
+
+    // Make sure the Close button in the modal works
+    const closeModalButtons = document.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"]');
+    closeModalButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modalElement = this.closest('.modal');
+            if (modalElement) {
+                try {
+                    $(modalElement).modal('hide');
+                } catch (e) {
+                    console.log('jQuery modal hide failed, trying other methods');
+                    try {
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+                    } catch (e2) {
+                        console.error('All methods failed, trying direct manipulation');
+                        modalElement.classList.remove('show');
+                        modalElement.style.display = 'none';
+                        document.body.classList.remove('modal-open');
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(el => el.remove());
+                    }
+                }
+            }
+        });
+    });
+
+    // Brand change handler for Add Product form
+    const brandSelect = document.getElementById('brandId');
+    const categorySelect = document.getElementById('categories');
     
+    if (brandSelect && categorySelect) {
+        brandSelect.addEventListener('change', function() {
+            fetchCategoriesForBrand(this.value, categorySelect);
+        });
+    }
+    
+    // Handle brand change in edit form
+    if (editBrandSelect && editCategorySelect) {
+        editBrandSelect.addEventListener('change', function() {
+            fetchCategoriesForBrand(this.value, editCategorySelect);
+        });
+    }
+    
+    // Make model and series fields in edit modal depend on make selection
     if (editMakeSelect && editModelSelect) {
         editMakeSelect.addEventListener('change', function() {
             const makeId = this.value;
@@ -1103,6 +1270,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (editSeriesSelect) {
                 editSeriesSelect.innerHTML = '<option value="">-- Select Series --</option>';
                 editSeriesSelect.disabled = true;
+            }
+            
+            // Reset and disable devices too
+            if (editDeviceSelect) {
+                editDeviceSelect.innerHTML = '<option value="">-- Select Device --</option>';
+                editDeviceSelect.disabled = true;
             }
             
             if (makeId) {
@@ -1133,6 +1306,12 @@ document.addEventListener('DOMContentLoaded', function() {
             editSeriesSelect.innerHTML = '<option value="">-- Select Series --</option>';
             editSeriesSelect.disabled = !modelId;
             
+            // Reset and disable devices too
+            if (editDeviceSelect) {
+                editDeviceSelect.innerHTML = '<option value="">-- Select Device --</option>';
+                editDeviceSelect.disabled = true;
+            }
+            
             if (modelId) {
                 // Fetch series for selected model via AJAX
                 fetch(`../admin/ajax_get_series.php?model_id=${modelId}`)
@@ -1153,16 +1332,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Make sure forms in image actions work properly
-    document.querySelectorAll('.image-action-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            // Ensure the parent form is submitted
-            if (e.target !== button) {
-                e.preventDefault();
-                button.form.submit();
+    // Device loading based on series selection
+    if (editSeriesSelect && editDeviceSelect) {
+        editSeriesSelect.addEventListener('change', function() {
+            const seriesId = this.value;
+            
+            // Reset and disable devices
+            editDeviceSelect.innerHTML = '<option value="">-- Select Device --</option>';
+            editDeviceSelect.disabled = !seriesId;
+            
+            if (seriesId) {
+                // Fetch devices for selected series via AJAX
+                fetch(`../api/get_devices.php?series_id=${seriesId}`)
+                    .then(response => response.json())
+                    .then(devices => {
+                        if (devices && devices.length > 0) {
+                            devices.forEach(device => {
+                                const option = document.createElement('option');
+                                option.value = device.id;
+                                option.textContent = device.name;
+                                editDeviceSelect.appendChild(option);
+                            });
+                            editDeviceSelect.disabled = false;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching devices:', error));
             }
         });
-    });
+    }
     
     // File input change event for image preview
     const fileInput = document.getElementById('productImages');
@@ -1276,186 +1473,151 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Fix for product form submission
-    const productForm = document.getElementById('productForm');
-    const submitProductBtn = document.getElementById('submitProductBtn');
-    
-    if (productForm && submitProductBtn) {
-        submitProductBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Form submitted via button click');
-            productForm.submit();
-        });
+    // Make device dropdown dependent on series selection
+    $('#seriesId').change(function() {
+        var seriesId = $(this).val();
+        var deviceSelect = $('#deviceId');
         
-        productForm.addEventListener('submit', function(e) {
-            console.log('Form submitted via form submit event');
-            // Allow the form to submit normally
-        });
-    }
-    
-    // Toggle status label update for direct buying
-    const directBuyingCheckbox = document.getElementById('directBuying');
-    const toggleStatus = document.querySelector('.toggle-status');
-    
-    if (directBuyingCheckbox && toggleStatus) {
-        directBuyingCheckbox.addEventListener('change', function() {
-            toggleStatus.textContent = this.checked ? 'Enabled' : 'Disabled';
-        });
-    }
-
-    // Handle edit product form submission
-    const editProductForm = document.getElementById('editProductForm');
-    if (editProductForm) {
-        editProductForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Edit product form submitted');
-            const formData = new FormData(this);
-            
-            fetch('../admin/manage_products.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                // If response is not JSON, reload the page to show the updated data
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    window.location.reload();
-                    return;
-                }
-                
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.success) {
-                    // Close the modal - use jQuery first as it's more reliable
-                    const editModalElement = document.getElementById('editProductModal');
-                    try {
-                        console.log('Attempting to close modal with jQuery');
-                        $(editModalElement).modal('hide');
-                        console.log('Modal hidden via jQuery');
-                    } catch (e) {
-                        console.log('jQuery modal hiding failed, trying Bootstrap 5:', e);
-                        try {
-                            // Try Bootstrap 5 way
-                            const editModal = bootstrap.Modal.getInstance(editModalElement);
-                            if (editModal) {
-                                editModal.hide();
-                                console.log('Modal hidden via Bootstrap 5 API');
-                            } else {
-                                throw new Error('No Bootstrap 5 modal instance found');
-                            }
-                        } catch (e2) {
-                            console.error('All modal closing methods failed:', e2);
-                            // Try direct manipulation as last resort
-                            try {
-                                editModalElement.classList.remove('show');
-                                editModalElement.style.display = 'none';
-                                document.body.classList.remove('modal-open');
-                                const backdrops = document.querySelectorAll('.modal-backdrop');
-                                backdrops.forEach(el => el.remove());
-                                console.log('Modal hidden via direct DOM manipulation');
-                            } catch (e3) {
-                                console.error('Even direct manipulation failed:', e3);
-                            }
-                        }
+        // Reset dropdown
+        deviceSelect.html('<option value="">-- Select Device --</option>');
+        
+        if (seriesId) {
+            deviceSelect.prop('disabled', true);
+            $.ajax({
+                url: '../api/get_devices.php',
+                data: { series_id: seriesId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, device) {
+                            deviceSelect.append($('<option></option>').val(device.id).text(device.name));
+                        });
+                        deviceSelect.prop('disabled', false);
+                    } else {
+                        deviceSelect.prop('disabled', true);
                     }
-                    
-                    // Show success message and reload page
-                    alert(data.message || 'Product updated successfully!');
-                    window.location.reload();
-                } else if (data) {
-                    alert(data.message || 'Error updating product. Please try again.');
+                },
+                error: function() {
+                    alert('Failed to load devices');
                 }
-            })
-            .catch(error => {
-                console.error('Error updating product:', error);
-                alert('Error updating product. Please try again.');
             });
-        });
-    }
-
-    // Make sure the Close button in the modal works
-    const closeModalButtons = document.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"]');
-    closeModalButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const modalElement = this.closest('.modal');
-            if (modalElement) {
-                try {
-                    $(modalElement).modal('hide');
-                } catch (e) {
-                    console.log('jQuery modal hide failed, trying other methods');
-                    try {
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        if (modal) modal.hide();
-                    } catch (e2) {
-                        console.error('All methods failed, trying direct manipulation');
-                        modalElement.classList.remove('show');
-                        modalElement.style.display = 'none';
-                        document.body.classList.remove('modal-open');
-                        const backdrops = document.querySelectorAll('.modal-backdrop');
-                        backdrops.forEach(el => el.remove());
-                    }
-                }
-            }
-        });
+        } else {
+            deviceSelect.prop('disabled', true);
+        }
     });
 
-    // Brand change handler for Add Product form
-    const brandSelect = document.getElementById('brandId');
-    const categorySelect = document.getElementById('categories');
+    // Initialize select2 for categories dropdown
+    $('#categories').select2({
+        placeholder: 'Select categories',
+        width: '100%'
+    });
     
-    if (brandSelect && categorySelect) {
-        brandSelect.addEventListener('change', function() {
-            fetchCategoriesForBrand(this.value, categorySelect);
-        });
-    }
-    
-    // Edit product form brand select
-    const editBrandSelect = document.getElementById('edit_brandId');
-    const editCategorySelect = document.getElementById('edit_categories');
-    
-    if (editBrandSelect && editCategorySelect) {
-        editBrandSelect.addEventListener('change', function() {
-            fetchCategoriesForBrand(this.value, editCategorySelect);
-        });
-    }
-    
-    // Function to fetch categories for a brand
-    function fetchCategoriesForBrand(brandId, categorySelectElement) {
-        if (!brandId) return;
+    // Make model dropdown dependent on make selection
+    $('#makeId').change(function() {
+        var makeId = $(this).val();
+        var modelSelect = $('#modelId');
+        var seriesSelect = $('#seriesId');
+        var deviceSelect = $('#deviceId');
         
-        // Show loading state
-        categorySelectElement.disabled = true;
-        categorySelectElement.innerHTML = '<option value="">Loading categories...</option>';
+        // Reset dropdowns
+        modelSelect.html('<option value="">-- Select Model --</option>');
+        seriesSelect.html('<option value="">-- Select Series --</option>');
+        deviceSelect.html('<option value="">-- Select Device --</option>');
+        seriesSelect.prop('disabled', true);
+        deviceSelect.prop('disabled', true);
         
-        fetch(`../admin/manage_products.php?action=get_brand_categories&brand_id=${brandId}`)
-            .then(response => response.json())
-            .then(data => {
-                categorySelectElement.innerHTML = '';
-                
-                if (data.success && data.categories && data.categories.length > 0) {
-                    data.categories.forEach(category => {
-                        const option = document.createElement('option');
-                        option.value = category.id;
-                        option.textContent = category.name;
-                        categorySelectElement.appendChild(option);
-                    });
-                } else {
-                    categorySelectElement.innerHTML = '<option value="">No categories found</option>';
+        if (makeId) {
+            modelSelect.prop('disabled', true);
+            $.ajax({
+                url: '../api/get_models.php',
+                data: { make_id: makeId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, model) {
+                            modelSelect.append($('<option></option>').val(model.id).text(model.name));
+                        });
+                        modelSelect.prop('disabled', false);
+                            } else {
+                        modelSelect.prop('disabled', true);
+                    }
+                },
+                error: function() {
+                    alert('Failed to load models');
                 }
-                
-                categorySelectElement.disabled = false;
-            })
-            .catch(error => {
-                console.error('Error fetching categories:', error);
-                categorySelectElement.innerHTML = '<option value="">Error loading categories</option>';
-                categorySelectElement.disabled = false;
             });
-    }
+        } else {
+            modelSelect.prop('disabled', true);
+        }
+    });
     
-    // Trigger the change event on page load if brand is already selected
-    if (brandSelect && brandSelect.value) {
-        brandSelect.dispatchEvent(new Event('change'));
-    }
+    // Make series dropdown dependent on model selection
+    $('#modelId').change(function() {
+        var modelId = $(this).val();
+        var seriesSelect = $('#seriesId');
+        var deviceSelect = $('#deviceId');
+        
+        // Reset dropdowns
+        seriesSelect.html('<option value="">-- Select Series --</option>');
+        deviceSelect.html('<option value="">-- Select Device --</option>');
+        deviceSelect.prop('disabled', true);
+        
+        if (modelId) {
+            seriesSelect.prop('disabled', true);
+            $.ajax({
+                url: '../api/get_series.php',
+                data: { model_id: modelId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, series) {
+                            seriesSelect.append($('<option></option>').val(series.id).text(series.name));
+                        });
+                        seriesSelect.prop('disabled', false);
+                    } else {
+                        seriesSelect.prop('disabled', true);
+                    }
+                },
+                error: function() {
+                    alert('Failed to load series');
+                }
+            });
+        } else {
+            seriesSelect.prop('disabled', true);
+        }
+    });
+    
+    // Make device dropdown dependent on series selection
+    $('#seriesId').change(function() {
+        var seriesId = $(this).val();
+        var deviceSelect = $('#deviceId');
+        
+        // Reset dropdown
+        deviceSelect.html('<option value="">-- Select Device --</option>');
+        
+        if (seriesId) {
+            deviceSelect.prop('disabled', true);
+            $.ajax({
+                url: '../api/get_devices.php',
+                data: { series_id: seriesId },
+                dataType: 'json',
+                success: function(data) {
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, device) {
+                            deviceSelect.append($('<option></option>').val(device.id).text(device.name));
+                        });
+                        deviceSelect.prop('disabled', false);
+                } else {
+                        deviceSelect.prop('disabled', true);
+                    }
+                },
+                error: function() {
+                    alert('Failed to load devices');
+                }
+            });
+        } else {
+            deviceSelect.prop('disabled', true);
+        }
+    });
 });
 </script> 

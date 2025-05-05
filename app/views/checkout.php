@@ -121,6 +121,13 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <span>Subtotal</span>
                     <span>₹<?php echo number_format($cartSubtotal, 2); ?></span>
                 </div>
+
+                <?php if ($isPremiumUser && $discountAmount > 0): ?>
+                <div class="order-discount premium-discount">
+                    <span>Premium Discount (<?php echo number_format($discountPercentage, 0); ?>%)</span>
+                    <span>-₹<?php echo number_format($discountAmount, 2); ?></span>
+                </div>
+                <?php endif; ?>
                 
                 <div class="order-subtotal">
                     <span>GST (18%)</span>
@@ -131,6 +138,12 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <span>Total</span>
                     <span>₹<?php echo number_format($cartTotal, 2); ?></span>
                 </div>
+                
+                <?php if (!$isPremiumUser): ?>
+                <div class="premium-note">
+                    <p>Premium members receive a <?php echo number_format(getPremiumDiscountPercentage(), 0); ?>% discount. <a href="register.php?premium=1">Join now</a> or <a href="login.php">login</a> to your premium account.</p>
+                </div>
+                <?php endif; ?>
             </div>
             
             <div class="payment-methods">
@@ -199,3 +212,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<style>
+.premium-discount {
+    background-color: #f8f2ff;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    color: #6a1b9a;
+    font-weight: bold;
+}
+
+.premium-note {
+    background-color: #f8f8f8;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    border-left: 3px solid #6a1b9a;
+}
+
+.premium-note a {
+    color: #6a1b9a;
+    text-decoration: underline;
+}
+</style>
+
+<?php require_once __DIR__ . '/partials/footer.php'; ?>
