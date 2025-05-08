@@ -1045,20 +1045,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         fetch('../admin/manage_products.php', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            // Check if the response is valid JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                // Not JSON, so get text to see what was returned
+                return response.text().then(text => {
+                    console.error('Received non-JSON response:', text);
+                    throw new Error('Invalid server response format (not JSON)');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Refresh the images in the modal
                 openEditProductModal(productId);
             } else {
+                console.error('Server returned error:', data);
                 alert('Error setting primary image: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error setting primary image:', error);
-            alert('Error setting primary image. Please try again.');
+            alert('Error setting primary image: ' + error.message);
         });
     }
     
@@ -1071,20 +1086,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         fetch('../admin/manage_products.php', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            // Check if the response is valid JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                // Not JSON, so get text to see what was returned
+                return response.text().then(text => {
+                    console.error('Received non-JSON response:', text);
+                    throw new Error('Invalid server response format (not JSON)');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 // Refresh the images in the modal
                 openEditProductModal(productId);
             } else {
+                console.error('Server returned error:', data);
                 alert('Error deleting image: ' + data.message);
             }
         })
         .catch(error => {
             console.error('Error deleting image:', error);
-            alert('Error deleting image. Please try again.');
+            alert('Error deleting image: ' + error.message);
         });
     }
     

@@ -14,6 +14,10 @@ require_once __DIR__ . '/../config/database.php';
 function getAllVehicleMakes() {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->query("SELECT id, name FROM vehicle_makes ORDER BY name");
         return $stmt->fetchAll();
@@ -30,6 +34,10 @@ function getAllVehicleMakes() {
  */
 function getVehicleModelsByMake($makeId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT id, name FROM vehicle_models WHERE make_id = ? ORDER BY name");
@@ -49,6 +57,10 @@ function getVehicleModelsByMake($makeId) {
 function getVehicleSeriesByModel($modelId) {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT id, name FROM vehicle_series WHERE model_id = ? ORDER BY name");
         $stmt->execute([$modelId]);
@@ -66,6 +78,10 @@ function getVehicleSeriesByModel($modelId) {
  */
 function getVehicleDevicesBySeries($seriesId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT id, name, description FROM vehicle_devices WHERE series_id = ? ORDER BY name");
@@ -86,6 +102,10 @@ function getVehicleDevicesBySeries($seriesId) {
  */
 function addVehicleDevice($seriesId, $name, $description = '') {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         $stmt = $pdo->prepare("INSERT INTO vehicle_devices (series_id, name, description) VALUES (?, ?, ?)");
@@ -115,6 +135,10 @@ function addVehicleDevice($seriesId, $name, $description = '') {
 function updateVehicleDevice($deviceId, $seriesId, $name, $description = '') {
     global $pdo;
     
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
     try {
         $stmt = $pdo->prepare("UPDATE vehicle_devices SET series_id = ?, name = ?, description = ? WHERE id = ?");
         $stmt->execute([$seriesId, $name, $description, $deviceId]);
@@ -135,6 +159,10 @@ function updateVehicleDevice($deviceId, $seriesId, $name, $description = '') {
  */
 function deleteVehicleDevice($deviceId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         // Check if device is used in products
@@ -170,6 +198,10 @@ function deleteVehicleDevice($deviceId) {
 function getVehicleDeviceById($deviceId) {
     global $pdo;
     
+    if (!$pdo) {
+        return false;
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT * FROM vehicle_devices WHERE id = ?");
         $stmt->execute([$deviceId]);
@@ -189,6 +221,7 @@ function getVehicleDeviceName($deviceId) {
     global $pdo;
     
     if (!$deviceId) return 'Not specified';
+    if (!$pdo) return 'Unknown';
     
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_devices WHERE id = ?");
@@ -201,19 +234,23 @@ function getVehicleDeviceName($deviceId) {
 }
 
 /**
- * Save vehicle form submission
+ * Save vehicle submission
  * 
  * @param int $userId User ID
  * @param int $makeId Make ID
  * @param int $modelId Model ID
  * @param int $seriesId Series ID
- * @param int|null $deviceId Device ID (optional)
  * @param string $phone Phone number
  * @param string $email Email address
+ * @param int|null $deviceId Device ID (optional)
  * @return array Result with status and message
  */
-function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $deviceId = null, $phone, $email) {
+function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $phone, $email, $deviceId = null) {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     // Validate input
     if (empty($makeId) || empty($modelId) || empty($seriesId) || empty($phone) || empty($email)) {
@@ -243,6 +280,10 @@ function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $deviceId 
 function getUserVehicleSubmissions($userId) {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT * FROM vehicle_submissions WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->execute([$userId]);
@@ -260,6 +301,10 @@ function getUserVehicleSubmissions($userId) {
  */
 function getVehicleMakeName($makeId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return 'Unknown';
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_makes WHERE id = ?");
@@ -280,6 +325,10 @@ function getVehicleMakeName($makeId) {
 function getVehicleModelName($modelId) {
     global $pdo;
     
+    if (!$pdo) {
+        return 'Unknown';
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_models WHERE id = ?");
         $stmt->execute([$modelId]);
@@ -299,6 +348,10 @@ function getVehicleModelName($modelId) {
 function getVehicleSeriesName($seriesId) {
     global $pdo;
     
+    if (!$pdo) {
+        return 'Unknown';
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_series WHERE id = ?");
         $stmt->execute([$seriesId]);
@@ -316,6 +369,10 @@ function getVehicleSeriesName($seriesId) {
  */
 function getAllVehicleSubmissions() {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->query("SELECT * FROM vehicle_submissions ORDER BY created_at DESC");
