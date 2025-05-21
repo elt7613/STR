@@ -3,6 +3,9 @@
  * Admin - Manage Products
  */
 
+// Ensure no output is sent before we decide what to send
+ob_start();
+
 // Include initialization script
 require_once __DIR__ . '/../../includes/init.php';
 
@@ -336,6 +339,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
         if ($jsonResponse) {
+            // Clean any output before sending JSON
+            ob_clean();
             header('Content-Type: application/json');
             echo json_encode($responseData);
             exit;
@@ -361,6 +366,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         
         if ($jsonResponse) {
+            // Clean any output before sending JSON
+            ob_clean();
             header('Content-Type: application/json');
             echo json_encode($responseData);
             exit;

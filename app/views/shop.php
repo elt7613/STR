@@ -78,7 +78,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         transform: translateY(-2px);
     }
     
-    .brand-products {
+    .brand-categories {
         margin-bottom: 50px;
     }
     
@@ -117,21 +117,27 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         }
     }
     
-    .product-card {
+    .category-card {
         position: relative;
         overflow: hidden;
         border: none;
         border-radius: 0;
+        transition: transform 0.3s ease;
     }
     
-    .product-image-container {
+    .category-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .category-image-container {
         position: relative;
         aspect-ratio: 1/1;
         overflow: hidden;
         background-color: #f3eef0;
     }
     
-    .product-card img {
+    .category-card img {
         position: absolute;
         top: 0;
         left: 0;
@@ -141,15 +147,17 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         transition: transform 0.3s ease-in-out;
     }
     
-    .product-card:hover img {
+    .category-card:hover img {
         transform: scale(1.1);
     }
     
-    .product-info {
-        padding: 15px 0;
+    .category-info {
+        padding: 15px;
+        background-color: #fff;
+        text-align: center;
     }
     
-    .product-title {
+    .category-title {
         font-weight: 700;
         margin-bottom: 8px;
         overflow: hidden;
@@ -161,23 +169,11 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         text-decoration: none;
     }
     
-    .product-title:hover {
+    .category-title:hover {
         color: #ff5bae;
     }
     
-    .product-price {
-        font-weight: 600;
-        font-size: 0.95rem;
-        color: #666666;
-    }
-    
-    .product-meta {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .no-products {
+    .no-categories {
         text-align: center;
         grid-column: 1 / -1;
         padding: 40px;
@@ -186,45 +182,75 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
         border: 2px dashed #ff5bae;
         color: #666;
     }
+    
+    .placeholder-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f3eef0;
+        color: #999;
+        font-weight: 500;
+        font-size: 1.2rem;
+    }
 </style>
 
 <!-- Main Shop Section -->
 <div class="container">
-    <h1 class="main-title">Shop</h1>
+    <h1 class="main-title">Shop by Categories</h1>
     
     <?php if (!empty($brands)): ?>
         <?php foreach ($brands as $brand): ?>
-            <div class="brand-products">
+            <div class="brand-categories">
                 <div class="brand-header">
                     <h2 class="brand-name"><?php echo htmlspecialchars($brand['name']); ?></h2>
-                    <a href="brand.php?id=<?php echo $brand['id']; ?>" class="view-more-btn">View More</a>
+                    <a href="brand.php?id=<?php echo $brand['id']; ?>" class="view-more-btn">View All Products</a>
                 </div>
                 
                 <div class="grid-container">
                     <?php 
-                    // Get products for this brand, limited to 4
-                    $brandProducts = [];
-                    if (!empty($products)) {
-                        $count = 0;
-                        foreach ($products as $product) {
-                            if ($product['brand_id'] == $brand['id'] && $count < 4) {
-                                $brandProducts[] = $product;
-                                $count++;
-                            }
-                        }
-                    }
+                    // Get categories for this brand
+                    $categories = $brandCategories[$brand['id']] ?? [];
                     
-                    if (!empty($brandProducts)): 
-                        foreach ($brandProducts as $product): 
+                    if (!empty($categories)): 
+                        foreach ($categories as $category): 
                     ?>
-                        <div class="product-card">
-                            <a href="product.php?id=<?php echo $product['id']; ?>">
-                                <div class="product-image-container">
-                                    <img src="<?php echo !empty($product['primary_image']) ? htmlspecialchars($product['primary_image']) : 'assets/img/product-placeholder.jpg'; ?>" alt="<?php echo htmlspecialchars($product['title']); ?>">
+                        <div class="category-card">
+                            <a href="category_products.php?id=<?php echo $category['id']; ?>">
+                                <div class="category-image-container">
+                                    <?php if (!empty($category['image_path'])): ?>
+                                        <?php
+                                        $original_path = $category['image_path'];
+                                        
+                                        // Fix for both local and hostinger environments
+                        // First, normalize the path by removing any existing '../' prefixes
+                        $normalized_path = preg_replace('/^\.\.\/+/', '', $original_path);
+                        
+                        // Then add the correct path prefix
+                        // For paths that point to /public/ directory
+                        if (strpos($normalized_path, 'public/') === 0) {
+                            // Use the path as is without the 'public/' part since we're already in public context
+                            $fixed_path = substr($normalized_path, 7); // Remove 'public/' prefix
+                        } else if (strpos($normalized_path, 'uploads/') === 0) {
+                            // Direct path to uploads folder
+                            $fixed_path = $normalized_path;
+                        } else {
+                            // For other paths, keep the original behavior
+                            $fixed_path = '../' . $normalized_path;
+                        }                ?>
+                                        <img src="<?php echo htmlspecialchars($fixed_path); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>">
+                                    <?php else: ?>
+                                        <div class="placeholder-image">
+                                            <span>Category</span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="product-info">
-                                    <h5 class="product-title"><?php echo htmlspecialchars($product['title']); ?></h5>
-                                    <div class="product-price">₹<?php echo number_format($product['amount'], 2); ?></div>
+                                <div class="category-info">
+                                    <h5 class="category-title"><?php echo htmlspecialchars($category['name']); ?></h5>
                                 </div>
                             </a>
                         </div>
@@ -232,8 +258,8 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                         endforeach;
                     else: 
                     ?>
-                        <div class="no-products">
-                            <p>No products available for this brand at the moment.</p>
+                        <div class="no-categories">
+                            <p>No categories available for this brand at the moment.</p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -246,23 +272,4 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
     <?php endif; ?>
 </div>
 
-<script>
-    // Handle wishlist button clicks
-    document.querySelectorAll('.wishlist-btn').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('far')) {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                // Add to wishlist logic here
-            } else {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                // Remove from wishlist logic here
-            }
-        });
-    });
-</script>
-
-<?php require_once __DIR__ . '/partials/footer.php'; ?>
+<?php require_once ROOT_PATH . '/app/views/partials/footer.php'; ?>

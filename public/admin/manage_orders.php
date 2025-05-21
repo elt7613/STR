@@ -34,6 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         $result = updateOrderStatus($orderId, $newStatus);
         
         if ($result['success']) {
+            // Send cancellation emails if order is being cancelled
+            if ($newStatus === 'cancelled') {
+                // Send emails to both admin and customer about cancellation
+                sendOrderCancellationEmails($orderId);
+                header('Location: manage_orders.php?action=view&id=' . $orderId . '&success=Order has been cancelled and notification emails have been sent.');
+                exit;
+            }
+            
             // Add specific message for COD orders marked as delivered
             if ($newStatus === 'delivered') {
                 $stmt = $pdo->prepare("SELECT payment_method FROM orders WHERE id = ?");

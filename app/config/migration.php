@@ -180,6 +180,16 @@ function createShopTables($pdo) {
         // Column likely already exists or table doesn't exist yet
     }
     
+    // Update categories table with image_path field if it doesn't exist
+    $sql = "SHOW COLUMNS FROM categories LIKE 'image_path'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    if ($stmt->rowCount() === 0) {
+        $sql = "ALTER TABLE categories ADD COLUMN image_path VARCHAR(255) NULL";
+        $pdo->exec($sql);
+        output("  Added image_path column to categories table");
+    }
+    
     // Products table
     $sql = "CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,

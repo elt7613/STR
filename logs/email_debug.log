@@ -91,3 +91,6 @@ sending limits go to
 [2025-05-02 18:28:08] About to call sendEmail function
 [2025-05-02 18:28:12] Email function returned: Email sent successfully!
 [2025-05-02 18:28:12] Email sent successfully
+[2025-05-10 18:20:26] Script started - Product Request
+[2025-05-10 18:20:26] Retrieved 1 categories for product: 7
+[2025-05-10 18:20:26] User not found: 1

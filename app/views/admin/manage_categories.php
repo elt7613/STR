@@ -60,7 +60,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                 <?php echo $currentCategory ? 'Edit Category' : 'Add New Category'; ?>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <input type="hidden" name="action" value="<?php echo $currentCategory ? 'update' : 'add'; ?>">
                     
                     <?php if ($currentCategory): ?>
@@ -90,6 +90,18 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                         <textarea class="form-control" id="description" name="description" rows="3"><?php echo $currentCategory ? htmlspecialchars($currentCategory['description']) : ''; ?></textarea>
                     </div>
                     
+                    <div class="mb-3">
+                        <label for="category_image" class="form-label">Category Image</label>
+                        <?php if ($currentCategory && !empty($currentCategory['image_path'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo htmlspecialchars($currentCategory['image_path']); ?>" alt="Current category image" style="max-width: 100%; max-height: 200px;" class="img-thumbnail">
+                                <p class="text-muted small mt-1">Current image</p>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" id="category_image" name="category_image" accept="image/jpeg,image/png,image/gif,image/webp">
+                        <small class="form-text text-muted">Upload an image for this category (JPEG, PNG, GIF, WEBP, max 2MB)</small>
+                    </div>
+                    
                     <button type="submit" class="btn btn-primary"><?php echo $currentCategory ? 'Update Category' : 'Add Category'; ?></button>
                     
                     <?php if ($currentCategory): ?>
@@ -115,6 +127,7 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
+                                <th>Image</th>
                                 <th>Brand</th>
                                 <th>Description</th>
                                 <th>Date Created</th>
@@ -126,6 +139,13 @@ require_once ROOT_PATH . '/app/views/admin/partials/header.php';
                             <tr>
                                 <td><?php echo $category['id']; ?></td>
                                 <td><?php echo htmlspecialchars($category['name']); ?></td>
+                                <td>
+                                    <?php if (!empty($category['image_path'])): ?>
+                                        <img src="<?php echo htmlspecialchars($category['image_path']); ?>" alt="Category Image" style="max-width: 80px; max-height: 60px;">
+                                    <?php else: ?>
+                                        <span class="text-muted">No image</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?php echo htmlspecialchars($category['brand_name'] ?? 'Unknown'); ?></td>
                                 <td><?php echo htmlspecialchars($category['description'] ?? ''); ?></td>
                                 <td><?php echo date('Y-m-d H:i', strtotime($category['created_at'])); ?></td>

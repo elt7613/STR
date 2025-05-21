@@ -78,7 +78,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                 </div>
                             </div>
 
-                            <div class="filter-group">
+                            <!-- <div class="filter-group">
                                 <label for="device_id" class="filter-label">Vehicle Device</label>
                                 <div class="custom-select-wrapper">
                                     <select class="custom-select" id="device_id" name="device_id" <?php echo empty($devices) && empty($deviceId) ? 'disabled' : ''; ?>>
@@ -90,7 +90,7 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         
                         <div class="filter-actions">

@@ -54,8 +54,8 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                     <?php 
                     if ($order['payment_method'] === 'cod') {
                         echo 'Cash on Delivery';
-                    } elseif ($order['payment_method'] === 'razorpay') {
-                        echo 'Razorpay';
+                    } elseif ($order['payment_method'] === 'phonepe') {
+                        echo 'PhonePe';
                         
                         // Display transaction ID if available
                         if (isset($paymentTransaction) && !empty($paymentTransaction['transaction_id'])) {

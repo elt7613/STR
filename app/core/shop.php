@@ -350,12 +350,41 @@ function updateProduct($productId, $brandId, $title, $amount, $description, $mak
     }
     
     try {
+        // First, get original product details for comparison
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([$productId]);
+        $originalProduct = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$originalProduct) {
+            return ['success' => false, 'message' => 'Product not found'];
+        }
+        
+        // Update the product in the database
         $stmt = $pdo->prepare("
             UPDATE products 
             SET brand_id = ?, title = ?, amount = ?, description = ?, make_id = ?, model_id = ?, series_id = ?, device_id = ?, direct_buying = ? 
             WHERE id = ?
         ");
         $stmt->execute([$brandId, $title, $amount, $description, $makeId, $modelId, $seriesId, $deviceId, $directBuying, $productId]);
+        
+        // Get updated product details
+        $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([$productId]);
+        $updatedProduct = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Send email notifications to users who purchased this product
+        if (function_exists('sendProductUpdateNotification')) {
+            // Only send notifications if significant data has changed
+            $significantChanges = 
+                $originalProduct['title'] != $updatedProduct['title'] ||
+                $originalProduct['amount'] != $updatedProduct['amount'] ||
+                $originalProduct['description'] != $updatedProduct['description'] ||
+                $originalProduct['direct_buying'] != $updatedProduct['direct_buying'];
+            
+            if ($significantChanges) {
+                sendProductUpdateNotification($productId, $updatedProduct);
+            }
+        }
         
         return ['success' => true, 'message' => 'Product updated successfully'];
     } catch (PDOException $e) {
@@ -673,9 +702,10 @@ function getCategoryById($categoryId) {
  * @param string $name Category name
  * @param int $brandId Brand ID
  * @param string $description Category description (optional)
+ * @param string|null $imagePath Path to category image (optional)
  * @return array Result with status and message
  */
-function addCategory($name, $brandId, $description = '') {
+function addCategory($name, $brandId, $description = '', $imagePath = null) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -702,8 +732,8 @@ function addCategory($name, $brandId, $description = '') {
         }
         
         // Insert new category
-        $stmt = $pdo->prepare("INSERT INTO categories (name, brand_id, description) VALUES (?, ?, ?)");
-        $stmt->execute([$name, $brandId, $description]);
+        $stmt = $pdo->prepare("INSERT INTO categories (name, brand_id, description, image_path) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$name, $brandId, $description, $imagePath]);
         
         return ['success' => true, 'message' => 'Category added successfully', 'id' => $pdo->lastInsertId()];
     } catch (PDOException $e) {
@@ -718,9 +748,10 @@ function addCategory($name, $brandId, $description = '') {
  * @param string $name Category name
  * @param int $brandId Brand ID
  * @param string $description Category description (optional)
+ * @param string|null $imagePath Path to category image (optional)
  * @return array Result with status and message
  */
-function updateCategory($categoryId, $name, $brandId, $description = '') {
+function updateCategory($categoryId, $name, $brandId, $description = '', $imagePath = null) {
     /** @var \PDO $pdo */
     global $pdo;
     
@@ -746,8 +777,16 @@ function updateCategory($categoryId, $name, $brandId, $description = '') {
             return ['success' => false, 'message' => 'Another category with this name already exists for this brand'];
         }
         
-        $stmt = $pdo->prepare("UPDATE categories SET name = ?, brand_id = ?, description = ? WHERE id = ?");
-        $stmt->execute([$name, $brandId, $description, $categoryId]);
+        // Get current category data to check if we need to update the image
+        $currentCategory = getCategoryById($categoryId);
+        
+        // If no new image is provided, keep the existing one
+        if ($imagePath === null && $currentCategory) {
+            $imagePath = $currentCategory['image_path'];
+        }
+        
+        $stmt = $pdo->prepare("UPDATE categories SET name = ?, brand_id = ?, description = ?, image_path = ? WHERE id = ?");
+        $stmt->execute([$name, $brandId, $description, $imagePath, $categoryId]);
         
         return ['success' => true, 'message' => 'Category updated successfully'];
     } catch (PDOException $e) {
@@ -1781,94 +1820,114 @@ function updateOrderStatus($orderId, $status) {
         // Begin transaction
         $pdo->beginTransaction();
         
-        // Update order status
-        $stmt = $pdo->prepare("
-            UPDATE orders SET status = :status, updated_at = NOW()
-            WHERE id = :order_id
-        ");
+        // Get the current order status
+        $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = :order_id");
+        $stmt->execute([':order_id' => $orderId]);
+        $currentStatus = $stmt->fetchColumn();
         
-        $stmt->execute([
-            ':status' => $status,
-            ':order_id' => $orderId
-        ]);
-        
-        // For COD orders: If order status is set to "delivered", update payment status to "completed"
-        if ($status == 'delivered') {
-            // Get order payment method to check if it's COD
+        // Only update if status has changed
+        if ($currentStatus !== $status) {
+            // Update order status
             $stmt = $pdo->prepare("
-                SELECT payment_method FROM orders WHERE id = :order_id
+                UPDATE orders SET status = :status, updated_at = NOW()
+                WHERE id = :order_id
             ");
-            $stmt->execute([':order_id' => $orderId]);
-            $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // If payment method is COD (case-insensitive check)
-            if ($orderData && (
-                strtolower($orderData['payment_method']) == 'cod' || 
-                strtolower($orderData['payment_method']) == 'cash on delivery'
-            )) {
-                // Update payment status to completed
+            $stmt->execute([
+                ':status' => $status,
+                ':order_id' => $orderId
+            ]);
+            
+            // For COD orders: If order status is set to "delivered", update payment status to "completed"
+            if ($status == 'delivered') {
+                // Get order payment method to check if it's COD
                 $stmt = $pdo->prepare("
-                    UPDATE orders SET payment_status = 'completed', updated_at = NOW()
-                    WHERE id = :order_id
+                    SELECT payment_method FROM orders WHERE id = :order_id
                 ");
                 $stmt->execute([':order_id' => $orderId]);
+                $orderData = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                // Also add a payment transaction record if none exists
-                $stmt = $pdo->prepare("
-                    SELECT COUNT(*) FROM payment_transactions WHERE order_id = :order_id
-                ");
-                $stmt->execute([':order_id' => $orderId]);
-                $hasTransaction = $stmt->fetchColumn() > 0;
-                
-                if (!$hasTransaction) {
-                    // Get order amount
+                // If payment method is COD (case-insensitive check)
+                if ($orderData && (
+                    strtolower($orderData['payment_method']) == 'cod' || 
+                    strtolower($orderData['payment_method']) == 'cash on delivery'
+                )) {
+                    // Update payment status to completed
                     $stmt = $pdo->prepare("
-                        SELECT total, currency FROM orders WHERE id = :order_id
+                        UPDATE orders SET payment_status = 'completed', updated_at = NOW()
+                        WHERE id = :order_id
                     ");
                     $stmt->execute([':order_id' => $orderId]);
-                    $orderInfo = $stmt->fetch(PDO::FETCH_ASSOC);
                     
-                    if ($orderInfo) {
+                    // Also add a payment transaction record if none exists
+                    $stmt = $pdo->prepare("
+                        SELECT COUNT(*) FROM payment_transactions WHERE order_id = :order_id
+                    ");
+                    $stmt->execute([':order_id' => $orderId]);
+                    $hasTransaction = $stmt->fetchColumn() > 0;
+                    
+                    if (!$hasTransaction) {
+                        // Get order amount
                         $stmt = $pdo->prepare("
-                            INSERT INTO payment_transactions (
-                                order_id, transaction_id, payment_method, 
-                                amount, currency, status, gateway_response
-                            ) VALUES (
-                                :order_id, :transaction_id, :payment_method, 
-                                :amount, :currency, :status, :gateway_response
-                            )
+                            SELECT total, currency FROM orders WHERE id = :order_id
                         ");
+                        $stmt->execute([':order_id' => $orderId]);
+                        $orderInfo = $stmt->fetch(PDO::FETCH_ASSOC);
                         
-                        $transactionId = 'COD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+                        if ($orderInfo) {
+                            $stmt = $pdo->prepare("
+                                INSERT INTO payment_transactions (
+                                    order_id, transaction_id, payment_method, 
+                                    amount, currency, status, gateway_response
+                                ) VALUES (
+                                    :order_id, :transaction_id, :payment_method, 
+                                    :amount, :currency, :status, :gateway_response
+                                )
+                            ");
+                            
+                            $transactionId = 'COD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+                            
+                            $stmt->execute([
+                                ':order_id' => $orderId,
+                                ':transaction_id' => $transactionId,
+                                ':payment_method' => 'Cash on Delivery',
+                                ':amount' => $orderInfo['total'],
+                                ':currency' => $orderInfo['currency'] ?? 'INR',
+                                ':status' => 'completed',
+                                ':gateway_response' => json_encode(['message' => 'Payment received on delivery'])
+                            ]);
+                        }
+                    } else {
+                        // Update existing payment transaction to completed
+                        $stmt = $pdo->prepare("
+                            UPDATE payment_transactions 
+                            SET status = 'completed', gateway_response = :gateway_response
+                            WHERE order_id = :order_id
+                        ");
                         
                         $stmt->execute([
                             ':order_id' => $orderId,
-                            ':transaction_id' => $transactionId,
-                            ':payment_method' => 'Cash on Delivery',
-                            ':amount' => $orderInfo['total'],
-                            ':currency' => $orderInfo['currency'] ?? 'INR',
-                            ':status' => 'completed',
-                            ':gateway_response' => json_encode(['message' => 'Payment received on delivery'])
+                            ':gateway_response' => json_encode(['message' => 'Payment received on delivery', 'updated_at' => date('Y-m-d H:i:s')])
                         ]);
                     }
-                } else {
-                    // Update existing payment transaction to completed
-                    $stmt = $pdo->prepare("
-                        UPDATE payment_transactions 
-                        SET status = 'completed', gateway_response = :gateway_response
-                        WHERE order_id = :order_id
-                    ");
-                    
-                    $stmt->execute([
-                        ':order_id' => $orderId,
-                        ':gateway_response' => json_encode(['message' => 'Payment received on delivery', 'updated_at' => date('Y-m-d H:i:s')])
-                    ]);
                 }
             }
         }
         
         // Commit transaction
         $pdo->commit();
+        
+        // Send email notification if status changed
+        if ($currentStatus !== $status && function_exists('sendOrderStatusUpdateEmail')) {
+            // For cancelled orders we use sendOrderCancellationEmails instead
+            if ($status === 'cancelled') {
+                if (function_exists('sendOrderCancellationEmails')) {
+                    sendOrderCancellationEmails($orderId);
+                }
+            } else {
+                sendOrderStatusUpdateEmail($orderId, $status);
+            }
+        }
         
         return [
             'success' => true,

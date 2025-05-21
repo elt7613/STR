@@ -26,6 +26,7 @@ if (!isLoggedIn() || !isAdmin()) {
 // Load the admin layout with the discount settings view
 $pageTitle = 'Premium Discount Settings - Admin';
 $currentPage = 'discount_settings';
+$currentScript = 'discount_settings.php';
 
 require_once ROOT_PATH . '/app/views/admin/partials/header.php';
 require_once ROOT_PATH . '/app/views/admin/discount_settings.php';

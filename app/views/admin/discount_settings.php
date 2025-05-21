@@ -1,4 +1,10 @@
 <?php
+// Set page title
+$pageTitle = 'Premium User Discount Settings';
+
+// Include header
+require_once ROOT_PATH . '/app/views/admin/partials/header.php';
+
 // Get the current discount percentage
 $currentDiscountPercentage = getPremiumDiscountPercentage();
 

@@ -18,6 +18,60 @@ $error = '';
 $success = '';
 $currentCategory = null;
 
+// Function to handle image upload
+function handleCategoryImageUpload() {
+    if (isset($_FILES['category_image']) && $_FILES['category_image']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['category_image'];
+        
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return ['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, GIF, and WEBP are allowed.'];
+        }
+        
+        // Validate file size (max 2MB)
+        $maxFileSize = 2 * 1024 * 1024; // 2MB
+        if ($file['size'] > $maxFileSize) {
+            return ['success' => false, 'message' => 'File is too large. Maximum size is 2MB.'];
+        }
+        
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'category_' . uniqid() . '.' . $extension;
+        
+        // Create upload directory if it doesn't exist
+        $uploadDir = ROOT_PATH . '/public/uploads/categories/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $uploadPath = $uploadDir . $filename;
+        
+        // Check if we're on localhost or a production server
+        $isLocalhost = ($_SERVER['HTTP_HOST'] == 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false);
+        
+        // Set the appropriate path based on the environment
+        if ($isLocalhost) {
+            $relativePath = '/uploads/categories/' . $filename;  // For local environment
+        } else {
+            $relativePath = '../uploads/categories/' . $filename;  // For Hostinger
+        }
+        
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            return [
+                'success' => true,
+                'path' => $relativePath,
+                'message' => 'Image uploaded successfully'
+            ];
+        } else {
+            return ['success' => false, 'message' => 'Failed to upload image.'];
+        }
+    }
+    
+    return ['success' => true, 'path' => null];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add or update category
     if (isset($_POST['action']) && ($_POST['action'] === 'add' || $_POST['action'] === 'update')) {
@@ -31,21 +85,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else if (empty($brandId)) {
             $error = 'Brand is required.';
         } else {
-            if ($_POST['action'] === 'add') {
-                // Adding new category
-                $result = addCategory($name, $brandId, $description);
-                if ($result['success']) {
-                    $success = $result['message'];
-                } else {
-                    $error = $result['message'];
-                }
+            // Handle image upload if file is selected
+            $uploadResult = handleCategoryImageUpload();
+            
+            if (!$uploadResult['success']) {
+                $error = $uploadResult['message'];
             } else {
-                // Updating existing category
-                $result = updateCategory($categoryId, $name, $brandId, $description);
-                if ($result['success']) {
-                    $success = $result['message'];
+                $imagePath = $uploadResult['path'];
+                
+                if ($_POST['action'] === 'add') {
+                    // Adding new category
+                    $result = addCategory($name, $brandId, $description, $imagePath);
+                    if ($result['success']) {
+                        $success = $result['message'];
+                    } else {
+                        $error = $result['message'];
+                    }
                 } else {
-                    $error = $result['message'];
+                    // Updating existing category
+                    $result = updateCategory($categoryId, $name, $brandId, $description, $imagePath);
+                    if ($result['success']) {
+                        $success = $result['message'];
+                    } else {
+                        $error = $result['message'];
+                    }
                 }
             }
         }

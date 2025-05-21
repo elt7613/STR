@@ -119,7 +119,22 @@ $headerBrands = getAllBrands();
                 <?php if (isLoggedIn()): ?>
                     <div class="user-menu dropdown">
                         <a href="#" class="nav-link" data-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> 
+                            <?php if (!empty($_SESSION['profile_image']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/profile_images/' . $_SESSION['profile_image'])): ?>
+                                <?php
+                                // Fix for both local and hostinger environments
+                                $img_path = 'uploads/profile_images/' . htmlspecialchars($_SESSION['profile_image']);
+                                
+                                // Make sure we have a valid path that works in both environments
+                                if (defined('BASE_URL')) {
+                                    $img_url = rtrim(BASE_URL, '/') . '/' . $img_path;
+                                } else {
+                                    $img_url = '/' . $img_path;
+                                }
+                                ?>
+                                <img src="<?php echo $img_url; ?>" alt="Profile" class="user-profile-image">
+                            <?php else: ?>
+                                <i class="fas fa-user-circle"></i>
+                            <?php endif; ?> 
                             <span class="username-text"><?php echo htmlspecialchars($_SESSION['username']); ?></span> 
                             <i class="fas fa-chevron-down dropdown-icon"></i>
                         </a>
@@ -127,6 +142,7 @@ $headerBrands = getAllBrands();
                             <?php if (isAdmin()): ?>
                                 <a href="admin/dashboard.php" class="dropdown-item">DASHBOARD</a>
                             <?php endif; ?>
+                            <a href="profile.php" class="dropdown-item">MY PROFILE</a>
                             <a href="logout.php" class="dropdown-item">LOGOUT</a>
                         </div>
                     </div>

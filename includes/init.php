@@ -55,6 +55,9 @@ require_once ROOT_PATH . '/app/config/vehicle_schema.php';
 // Include shop schema
 require_once ROOT_PATH . '/app/config/shop_schema.php';
 
+// Include email functions
+require_once ROOT_PATH . '/app/config/email.php';
+
 // Include authentication functions
 require_once ROOT_PATH . '/app/core/auth.php';
 

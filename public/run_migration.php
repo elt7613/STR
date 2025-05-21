@@ -27,6 +27,13 @@ echo "<pre>";
 // Show info about what's happening
 browserOutput("Starting database migration at " . date('Y-m-d H:i:s'));
 browserOutput("------------------------------------------");
+browserOutput("This script will CREATE new tables or UPDATE existing tables as needed, based on the latest schema.");
+browserOutput("You can safely run this multiple times.\n");
+
+// Prevent session_start in database.php
+if (!defined('SKIP_SESSION_START')) {
+    define('SKIP_SESSION_START', true);
+}
 
 try {
     // Include the migration file - don't worry about transactions, let the migration file handle it
@@ -35,6 +42,7 @@ try {
     // Success message - the tables were created successfully based on the output
     browserOutput("------------------------------------------");
     browserOutput("Migration completed successfully!");
+    browserOutput("All tables are now up-to-date with the latest schema.");
     
     // Add a note about the transaction warning
     if (strpos(ob_get_contents(), "no active transaction") !== false) {

@@ -7,6 +7,9 @@
 // Include initialization file
 require_once __DIR__ . '/../includes/init.php';
 
+// Ensure the function is available
+require_once ROOT_PATH . '/app/config/email.php';
+
 // Check if order ID is provided
 if (!isset($_GET['order_id']) && !isset($_SESSION['last_order_id'])) {
     header('Location: index.php');
@@ -43,32 +46,6 @@ $billingDetails = getBillingDetailsByOrderId($orderId);
 // Get payment transaction details (for display purposes)
 $paymentTransaction = null;
 if ($order['payment_method'] === 'razorpay') {
-    // Function to get latest payment transaction
-    function getLatestPaymentTransaction($orderId) {
-        /** @var \PDO $pdo */
-        global $pdo;
-        
-        if (!$pdo) {
-            return null;
-        }
-        
-        try {
-            $stmt = $pdo->prepare("
-                SELECT * FROM payment_transactions
-                WHERE order_id = :order_id
-                ORDER BY created_at DESC
-                LIMIT 1
-            ");
-            
-            $stmt->execute([':order_id' => $orderId]);
-            
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (\PDOException $e) {
-            error_log('Error fetching payment transaction: ' . $e->getMessage());
-            return null;
-        }
-    }
-    
     $paymentTransaction = getLatestPaymentTransaction($orderId);
 }
 

@@ -6,6 +6,9 @@
 // Include database configuration
 require_once __DIR__ . '/../config/database.php';
 
+// Include email functions
+require_once __DIR__ . '/email.php';
+
 /**
  * Get all vehicle makes
  * 
@@ -13,6 +16,10 @@ require_once __DIR__ . '/../config/database.php';
  */
 function getAllVehicleMakes() {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->query("SELECT id, name FROM vehicle_makes ORDER BY name");
@@ -30,6 +37,10 @@ function getAllVehicleMakes() {
  */
 function getVehicleModelsByMake($makeId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT id, name FROM vehicle_models WHERE make_id = ? ORDER BY name");
@@ -49,6 +60,10 @@ function getVehicleModelsByMake($makeId) {
 function getVehicleSeriesByModel($modelId) {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT id, name FROM vehicle_series WHERE model_id = ? ORDER BY name");
         $stmt->execute([$modelId]);
@@ -66,6 +81,10 @@ function getVehicleSeriesByModel($modelId) {
  */
 function getVehicleDevicesBySeries($seriesId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return [];
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT id, name, description FROM vehicle_devices WHERE series_id = ? ORDER BY name");
@@ -86,6 +105,10 @@ function getVehicleDevicesBySeries($seriesId) {
  */
 function addVehicleDevice($seriesId, $name, $description = '') {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         $stmt = $pdo->prepare("INSERT INTO vehicle_devices (series_id, name, description) VALUES (?, ?, ?)");
@@ -115,6 +138,10 @@ function addVehicleDevice($seriesId, $name, $description = '') {
 function updateVehicleDevice($deviceId, $seriesId, $name, $description = '') {
     global $pdo;
     
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
     try {
         $stmt = $pdo->prepare("UPDATE vehicle_devices SET series_id = ?, name = ?, description = ? WHERE id = ?");
         $stmt->execute([$seriesId, $name, $description, $deviceId]);
@@ -135,6 +162,10 @@ function updateVehicleDevice($deviceId, $seriesId, $name, $description = '') {
  */
 function deleteVehicleDevice($deviceId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     try {
         // Check if device is used in products
@@ -170,6 +201,10 @@ function deleteVehicleDevice($deviceId) {
 function getVehicleDeviceById($deviceId) {
     global $pdo;
     
+    if (!$pdo) {
+        return false;
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT * FROM vehicle_devices WHERE id = ?");
         $stmt->execute([$deviceId]);
@@ -189,6 +224,7 @@ function getVehicleDeviceName($deviceId) {
     global $pdo;
     
     if (!$deviceId) return 'Not specified';
+    if (!$pdo) return 'Unknown';
     
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_devices WHERE id = ?");
@@ -201,19 +237,23 @@ function getVehicleDeviceName($deviceId) {
 }
 
 /**
- * Save vehicle form submission
+ * Save vehicle submission
  * 
  * @param int $userId User ID
  * @param int $makeId Make ID
  * @param int $modelId Model ID
  * @param int $seriesId Series ID
- * @param int|null $deviceId Device ID (optional)
  * @param string $phone Phone number
  * @param string $email Email address
+ * @param int|null $deviceId Device ID (optional)
  * @return array Result with status and message
  */
-function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $deviceId = null, $phone, $email) {
+function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $phone, $email, $deviceId = null) {
     global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
     
     // Validate input
     if (empty($makeId) || empty($modelId) || empty($seriesId) || empty($phone) || empty($email)) {
@@ -243,6 +283,10 @@ function saveVehicleSubmission($userId, $makeId, $modelId, $seriesId, $deviceId 
 function getUserVehicleSubmissions($userId) {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT * FROM vehicle_submissions WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->execute([$userId]);
@@ -260,6 +304,10 @@ function getUserVehicleSubmissions($userId) {
  */
 function getVehicleMakeName($makeId) {
     global $pdo;
+    
+    if (!$pdo) {
+        return 'Unknown';
+    }
     
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_makes WHERE id = ?");
@@ -280,6 +328,10 @@ function getVehicleMakeName($makeId) {
 function getVehicleModelName($modelId) {
     global $pdo;
     
+    if (!$pdo) {
+        return 'Unknown';
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_models WHERE id = ?");
         $stmt->execute([$modelId]);
@@ -299,6 +351,10 @@ function getVehicleModelName($modelId) {
 function getVehicleSeriesName($seriesId) {
     global $pdo;
     
+    if (!$pdo) {
+        return 'Unknown';
+    }
+    
     try {
         $stmt = $pdo->prepare("SELECT name FROM vehicle_series WHERE id = ?");
         $stmt->execute([$seriesId]);
@@ -317,11 +373,228 @@ function getVehicleSeriesName($seriesId) {
 function getAllVehicleSubmissions() {
     global $pdo;
     
+    if (!$pdo) {
+        return [];
+    }
+    
     try {
         $stmt = $pdo->query("SELECT * FROM vehicle_submissions ORDER BY created_at DESC");
         return $stmt->fetchAll();
     } catch (PDOException $e) {
         return [];
+    }
+}
+
+/**
+ * Save user vehicle information
+ * 
+ * @param int $userId User ID
+ * @param string $brand Vehicle brand
+ * @param string $model Vehicle model
+ * @param string $series Vehicle series
+ * @param array $images Array of uploaded image files
+ * @return array Result with status and message
+ */
+function saveUserVehicleInfo($userId, $brand, $model, $series, $images = []) {
+    global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
+    // Validate input
+    if (empty($userId) || empty($brand) || empty($model)) {
+        return ['success' => false, 'message' => 'Brand and model are required fields'];
+    }
+    
+    try {
+        // Begin transaction
+        $pdo->beginTransaction();
+        
+        // Insert vehicle information
+        $stmt = $pdo->prepare("INSERT INTO vehicle_info (user_id, brand, model, series) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$userId, $brand, $model, $series]);
+        $vehicleId = $pdo->lastInsertId();
+        
+        // Process images if any
+        $uploadedImages = [];
+        if (!empty($images) && is_array($images)) {
+            foreach ($images as $image) {
+                $imageResult = uploadVehicleImage($vehicleId, $image);
+                if ($imageResult['success']) {
+                    $uploadedImages[] = $imageResult['path'];
+                }
+            }
+        }
+        
+        // Send email notification to admin about the new vehicle submission
+        $vehicleData = [
+            'brand' => $brand,
+            'model' => $model,
+            'series' => $series
+        ];
+        
+        // Use our updated function to send the email notification
+        $emailSent = sendVehicleSubmissionEmail($userId, $vehicleData, count($uploadedImages));
+        
+        // Commit transaction
+        $pdo->commit();
+        
+        return [
+            'success' => true, 
+            'message' => 'Vehicle information submitted successfully',
+            'vehicle_id' => $vehicleId,
+            'images' => $uploadedImages,
+            'email_sent' => $emailSent
+        ];
+    } catch (PDOException $e) {
+        // Rollback transaction on error
+        $pdo->rollBack();
+        return ['success' => false, 'message' => 'Submission failed: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Upload vehicle image
+ * 
+ * @param int $vehicleId Vehicle ID
+ * @param array $imageFile Uploaded image file ($_FILES array element)
+ * @return array Result with status and message
+ */
+function uploadVehicleImage($vehicleId, $imageFile) {
+    global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
+    // Check if image is valid
+    if (!isset($imageFile['tmp_name']) || empty($imageFile['tmp_name'])) {
+        return ['success' => false, 'message' => 'No image file uploaded'];
+    }
+    
+    // Check file size (max 5MB)
+    if ($imageFile['size'] > 5 * 1024 * 1024) {
+        return ['success' => false, 'message' => 'Image file is too large (max 5MB)'];
+    }
+    
+    // Check file type
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!in_array($imageFile['type'], $allowedTypes)) {
+        return ['success' => false, 'message' => 'Invalid image type. Allowed types: JPG, PNG, GIF, WEBP'];
+    }
+    
+    // Generate unique filename
+    $extension = pathinfo($imageFile['name'], PATHINFO_EXTENSION);
+    $filename = uniqid('vehicle_') . '.' . $extension;
+    $uploadPath = VEHICLE_IMAGES_DIR . $filename;
+    
+    // Upload the file
+    if (move_uploaded_file($imageFile['tmp_name'], $uploadPath)) {
+        // Save image path to database
+        try {
+            $stmt = $pdo->prepare("INSERT INTO vehicle_images (vehicle_id, image_path) VALUES (?, ?)");
+            $stmt->execute([$vehicleId, $filename]);
+            
+            return [
+                'success' => true, 
+                'message' => 'Image uploaded successfully',
+                'path' => $filename,
+                'id' => $pdo->lastInsertId()
+            ];
+        } catch (PDOException $e) {
+            // Delete the uploaded file if database insert fails
+            unlink($uploadPath);
+            return ['success' => false, 'message' => 'Failed to save image information: ' . $e->getMessage()];
+        }
+    } else {
+        return ['success' => false, 'message' => 'Failed to upload image'];
+    }
+}
+
+/**
+ * Get vehicle information for a specific user
+ * 
+ * @param int $userId User ID
+ * @return array Vehicle information with images
+ */
+function getUserVehicleInfo($userId) {
+    global $pdo;
+    
+    if (!$pdo) {
+        return null;
+    }
+    
+    try {
+        // Get vehicle information
+        $stmt = $pdo->prepare("SELECT * FROM vehicle_info WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
+        $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Get images for each vehicle
+        foreach ($vehicles as &$vehicle) {
+            $stmt = $pdo->prepare("SELECT * FROM vehicle_images WHERE vehicle_id = ?");
+            $stmt->execute([$vehicle['id']]);
+            $vehicle['images'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        
+        return $vehicles;
+    } catch (PDOException $e) {
+        return null;
+    }
+}
+
+/**
+ * Delete vehicle information
+ * 
+ * @param int $vehicleId Vehicle ID
+ * @param int $userId User ID (for verification)
+ * @return array Result with status and message
+ */
+function deleteVehicleInfo($vehicleId, $userId) {
+    global $pdo;
+    
+    if (!$pdo) {
+        return ['success' => false, 'message' => 'Database connection error'];
+    }
+    
+    try {
+        // Check if the vehicle belongs to the user
+        $stmt = $pdo->prepare("SELECT * FROM vehicle_info WHERE id = ? AND user_id = ?");
+        $stmt->execute([$vehicleId, $userId]);
+        
+        if ($stmt->rowCount() === 0) {
+            return ['success' => false, 'message' => 'Vehicle not found or does not belong to the user'];
+        }
+        
+        // Begin transaction
+        $pdo->beginTransaction();
+        
+        // Get all image paths
+        $stmt = $pdo->prepare("SELECT image_path FROM vehicle_images WHERE vehicle_id = ?");
+        $stmt->execute([$vehicleId]);
+        $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Delete physical image files
+        foreach ($images as $image) {
+            $imagePath = VEHICLE_IMAGES_DIR . $image['image_path'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        
+        // Delete from database (vehicle_images will be deleted automatically via CASCADE)
+        $stmt = $pdo->prepare("DELETE FROM vehicle_info WHERE id = ?");
+        $stmt->execute([$vehicleId]);
+        
+        // Commit transaction
+        $pdo->commit();
+        
+        return ['success' => true, 'message' => 'Vehicle information deleted successfully'];
+    } catch (PDOException $e) {
+        // Rollback transaction on error
+        $pdo->rollBack();
+        return ['success' => false, 'message' => 'Deletion failed: ' . $e->getMessage()];
     }
 }
 ?> 
