@@ -58,6 +58,9 @@
                 <a href="manage_products.php" class="<?php echo $currentScript == 'manage_products.php' ? 'active' : ''; ?>">
                     <i class="fas fa-box"></i> Products
                 </a>
+                <a href="premium_management.php" class="<?php echo ($currentScript == 'premium_management.php' || $activeMenu == 'premium') ? 'active' : ''; ?>">
+                    <i class="fas fa-crown"></i> Premium Management
+                </a>
                 <a href="discount_settings.php" class="<?php echo ($currentScript == 'discount_settings.php' || $currentPage == 'discount_settings') ? 'active' : ''; ?>">
                     <i class="fas fa-percent"></i> Premium Discounts
                 </a>

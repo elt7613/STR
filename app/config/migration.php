@@ -387,6 +387,106 @@ function createShopTables($pdo) {
     output("✓ Discount codes table created or updated");
 }
 
+// Function to create or update premium membership tables
+function createPremiumTables($pdo) {
+    // Premium Pricing table
+    $sql = "CREATE TABLE IF NOT EXISTS premium_pricing (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        price DECIMAL(10,2) NOT NULL,
+        duration_months INT NOT NULL DEFAULT 12,
+        is_active TINYINT(1) DEFAULT 1,
+        is_recommended TINYINT(1) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )";
+    $pdo->exec($sql);
+    output("✓ Premium pricing table created or updated");
+    
+    // Check if is_recommended column exists, add it if not
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM premium_pricing LIKE 'is_recommended'");
+        if ($stmt->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE premium_pricing ADD COLUMN is_recommended TINYINT(1) DEFAULT 0");
+            output("  Added is_recommended column to premium_pricing table");
+        }
+    } catch (PDOException $e) {
+        // Column likely already exists or table doesn't exist yet
+    }
+    
+    // Ensure premium_expiry column exists in users table
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM users LIKE 'premium_expiry'");
+        if ($stmt->rowCount() == 0) {
+            $pdo->exec("ALTER TABLE users ADD COLUMN premium_expiry DATETIME DEFAULT NULL AFTER is_premium_member");
+            output("  Added premium_expiry column to users table");
+        }
+    } catch (PDOException $e) {
+        // Column likely already exists or table doesn't exist yet
+    }
+    
+    // Premium Payments table
+    $sql = "CREATE TABLE IF NOT EXISTS premium_payments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        plan_id INT NOT NULL,
+        payment_id VARCHAR(100) NOT NULL,
+        payment_amount DECIMAL(10,2) NOT NULL,
+        payment_status VARCHAR(50) DEFAULT 'completed',
+        order_reference VARCHAR(100) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (plan_id) REFERENCES premium_pricing(id)
+    )";
+    $pdo->exec($sql);
+    output("✓ Premium payments table created or updated");
+    
+    // Check if amount column exists, if so migrate to payment_amount
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM premium_payments LIKE 'amount'");
+        if ($stmt->rowCount() > 0) {
+            // Column exists, update all records to use payment_amount
+            $pdo->exec("UPDATE premium_payments SET payment_amount = amount WHERE payment_amount IS NULL");
+            $pdo->exec("ALTER TABLE premium_payments DROP COLUMN amount");
+            output("  Migrated amount column to payment_amount in premium_payments table");
+        }
+    } catch (PDOException $e) {
+        // Column likely already exists or table doesn't exist yet
+    }
+    
+    // Check if payment_date column exists, if so migrate to created_at
+    try {
+        $stmt = $pdo->query("SHOW COLUMNS FROM premium_payments LIKE 'payment_date'");
+        if ($stmt->rowCount() > 0) {
+            // Column exists, update all records to use created_at
+            $pdo->exec("UPDATE premium_payments SET created_at = payment_date WHERE created_at IS NULL");
+            $pdo->exec("ALTER TABLE premium_payments DROP COLUMN payment_date");
+            output("  Migrated payment_date column to created_at in premium_payments table");
+        }
+    } catch (PDOException $e) {
+        // Column likely already exists or table doesn't exist yet
+    }
+    
+    // Check if there's at least one active premium plan
+    $stmt = $pdo->query("SELECT COUNT(*) as plan_count FROM premium_pricing WHERE is_active = 1");
+    $result = $stmt->fetch();
+    
+    // If no active plans exist, create a default one
+    if ($result && $result['plan_count'] == 0) {
+        $stmt = $pdo->prepare("INSERT INTO premium_pricing (name, description, price, duration_months, is_active) 
+                            VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([
+            'Annual Premium Membership',
+            'Enjoy exclusive benefits including discounts on all services for one full year.',
+            2999.00,
+            12,
+            1
+        ]);
+        output("  Created default premium pricing plan");
+    }
+}
+
 // Main function to create or update all tables
 function runAllMigrations($pdo) {
     output("=== Database Migration Started ===");
@@ -400,6 +500,9 @@ function runAllMigrations($pdo) {
     
     // Create shop tables
     createShopTables($pdo);
+    
+    // Create premium membership tables
+    createPremiumTables($pdo);
     
     output("=== Database Migration Completed ===");
     output("Finished at " . date('Y-m-d H:i:s'));

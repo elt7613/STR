@@ -398,6 +398,10 @@
         transform: translateY(0);
     }
     
+    .mobile-only-menu {
+        display: block;
+    }
+    
     .nav-list {
         flex-direction: column;
         gap: 16px;
@@ -491,6 +495,11 @@
     }
 }
 
+/* Mobile Profile Menu */
+.mobile-only-profile {
+    display: none; /* Hidden by default on all screens */
+}
+
 /* Responsive Styles */
 @media (max-width: 1024px) {
     .logo {
@@ -568,6 +577,16 @@
 
 /* Responsive styles for user menu */
 @media (max-width: 768px) {
+    /* Hide desktop user menu in header actions */
+    .header-actions .user-menu {
+        display: none;
+    }
+    
+    /* Show mobile profile menu in navigation */
+    .mobile-only-profile {
+        display: block;
+    }
+    
     .header-actions {
         gap: 10px;
     }

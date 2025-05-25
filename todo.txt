@@ -1,5 +1,0 @@
-- in shop page show category and inside cat the products (in home page feature product has category name while showing product)✅
-- category should have image ✅
-- profile page with image and car details (optional) ✅
-- phonepe integration 
-- emial credentials of email replace ✅

@@ -13,9 +13,6 @@ require_once ROOT_PATH . '/app/config/email.php';
 // Include discount functionality
 require_once ROOT_PATH . '/app/config/discount.php';
 
-// Include PhonePe configuration
-require_once ROOT_PATH . '/app/config/phonepe.php';
-
 // Initialize variables
 $error = '';
 $success = '';
@@ -161,12 +158,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } else {
                             $error = 'Payment processing error: ' . $paymentResult['message'];
                         }
-                    } elseif ($paymentMethod === 'phonepe') {
-                        // For PhonePe payment, create a pending transaction
+                    } elseif ($paymentMethod === 'razorpay') {
+                        // For Razorpay payment, create a pending transaction
                         $paymentResult = recordPaymentTransaction(
                             $orderId,
                             null, // transaction ID will be set after payment
-                            'phonepe',
+                            'razorpay',
                             $cartTotal,
                             'pending' // Always start with pending status
                         );
@@ -181,10 +178,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['pending_order_id'] = $orderId;
                         
                         // Debug message - will be removed in production
-                        error_log("Redirecting to PhonePe payment page with order_id: " . $orderId);
+                        error_log("Redirecting to Razorpay payment page with order_id: " . $orderId);
                         
-                        // Redirect to PhonePe payment page
-                        header('Location: phonepe-payment.php?order_id=' . $orderId);
+                        // Redirect to Razorpay payment page with auto_open parameter
+                        header('Location: razorpay-payment.php?order_id=' . $orderId . '&auto_open=1');
                         exit;
                     } else {
                         $error = 'Invalid payment method';

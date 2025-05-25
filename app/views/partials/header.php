@@ -47,6 +47,8 @@ $headerBrands = getAllBrands();
     <!-- JavaScript -->
     <script src="assets/js/header.js" defer></script>
     <script src="assets/js/cart.js" defer></script>
+    
+    <!-- No custom scripts needed - using pure CSS approach -->
 </head>
 <body style="background: #fff;">
     <!-- Navigation Bar -->
@@ -102,6 +104,20 @@ $headerBrands = getAllBrands();
                             <a href="https://strworks.netpy.in/premium-membership/" class="dropdown-item">PREMIUM MEMBERSHIP</a>
                         </div>
                     </li>
+                    
+                    <!-- Mobile-only profile menu -->
+                    <?php if (isLoggedIn()): ?>
+                    <li class="nav-item dropdown mobile-only-profile">
+                        <a href="#" class="nav-link" data-toggle="dropdown">MY ACCOUNT <i class="fas fa-chevron-down dropdown-icon"></i></a>
+                        <div class="dropdown-menu">
+                            <?php if (isAdmin()): ?>
+                                <a href="admin/dashboard.php" class="dropdown-item">DASHBOARD</a>
+                            <?php endif; ?>
+                            <a href="profile.php" class="dropdown-item">MY PROFILE</a>
+                            <a href="logout.php" class="dropdown-item">LOGOUT</a>
+                        </div>
+                    </li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             

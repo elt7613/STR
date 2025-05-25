@@ -65,4 +65,4 @@ require_once ROOT_PATH . '/app/core/auth.php';
 require_once ROOT_PATH . '/app/core/shop.php';
 
 require_once ROOT_PATH . '/app/core/vehicle.php';
-?> 
+?>

@@ -158,14 +158,14 @@ require_once ROOT_PATH . '/app/views/partials/header.php';
                 </div> -->
                 
                 <div class="payment-method">
-                    <label for="payment_phonepe">
-                        <input type="radio" id="payment_phonepe" name="payment_method" value="phonepe" form="checkout-form" checked>
-                        <span>PhonePe</span>
+                    <label for="payment_razorpay">
+                        <input type="radio" id="payment_razorpay" name="payment_method" value="razorpay" form="checkout-form" checked>
+                        <span>Razorpay</span>
                     </label>
                     <div class="payment-logo">
-                        <img src="assets/img/phonepe-logo.svg" alt="PhonePe" class="phonepe-logo">
+                        <img src="assets/img/razorpay-logo.svg" alt="Razorpay" class="razorpay-logo">
                     </div>
-                    <p class="payment-description">Pay securely with PhonePe. Credit/Debit Cards, Net Banking, UPI, and other payment methods supported.</p>
+                    <p class="payment-description">Pay securely with Razorpay. Credit/Debit Cards, Net Banking, UPI, and other payment methods supported.</p>
                 </div>
                 
                 <button type="submit" class="place-order-btn" form="checkout-form" id="place-order-btn">Place order</button>
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const paymentInput = document.createElement('input');
                 paymentInput.type = 'hidden';
                 paymentInput.name = 'payment_method';
-                paymentInput.value = 'phonepe'; // Default to PhonePe
+                paymentInput.value = 'razorpay'; // Default to Razorpay
                 form.appendChild(paymentInput);
             }
             
